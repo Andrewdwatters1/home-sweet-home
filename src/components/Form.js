@@ -7,14 +7,19 @@ import { updateUser } from '../redux/reducers/user';
 class Form extends Component {
   constructor(props) {
     super(props)
+    this.state = {
+      submitEnabled: false
+    }
   }
 
   validateInput = (e) => {
+    e.preventDefault();
     const { name, value } = e.target;
+
     const nameRegExp = /^[A-Za-zÀ-ÿ ,.'-]+$/;
     const emailRegExp = /^.+\@[A-Za-z0-9\-]+\.com/;
     const zipRegExp = /^\d{5}$|^\d{5}-{1}\d{4}$/;
-    const cityRegExp = /^[A-Za-z]+[A-Za-z\.\ ]*,\ [A-Za-z]{2}/;
+    const cityRegExp = /^[A-Za-z]+[A-Za-z\. ]*,\ [A-Za-z]{2}/;
 
     if (name === 'first' || name === 'last') {
       if (nameRegExp.test(value)) this.validInput(e)
@@ -28,42 +33,67 @@ class Form extends Component {
       if (zipRegExp.test(value) || cityRegExp.test(value)) this.validInput(e)
       else this.invalidInput(name);
     }
-    // if ((name === 'first' && validName) || (name === 'last' && validName)) this.validInput(e);
-    // else if (name === 'email' && validEmail) this.validInput(e);
-    // else if (name === 'location' && validLoc) this.validInput(e);
   }
 
-  validInput(e) {
-    const tgt = document.querySelectorAll(`input[name="${e.target.name}"]`)[0]
-    tgt.classList.remove('form-invalid');
-    tgt.classList.add('form-valid')
+  validInput = (e) => {
+    const { name } = e.target;
     this.props.updateUser(e)
+    const tgtInput = document.querySelectorAll(`input[name="${name}"]`)[0]
+    tgtInput.classList.add('form-valid')
+    tgtInput.classList.remove('form-invalid')
+    this.setState({
+      submitEnabled: true
+    })
   }
 
-  invalidInput(name) {
-    const tgt = document.querySelectorAll(`input[name="${name}"]`)[0]
-    tgt.classList.add('form-invalid');
-    tgt.classList.remove('form-valid')
+  invalidInput = name => {
+    const tgtInput = document.querySelectorAll(`input[name="${name}"]`)[0]
+    tgtInput.classList.add('form-invalid');
+    tgtInput.classList.remove('form-valid');
+    this.setState({
+      submitEnabled: false
+    })
+  }
+
+  submitForm = (e) => {
+    e.preventDefault();
+    const { first, last, email, location } = this.props.user;
+    if (this.state.submitEnabled && first && last && email && location) this.props.history.push('/');
+    else this.validateInput(e)
   }
 
   render() {
-    console.log('current user is', this.props.user)
+    const { first, last, email, location } = this.props.user;
     return (
       <div className="form-background">
         <div className="form inner">
-          <form onSubmit={this.submitUserInfo}>
+
+          <form id="initial">
             <label for="first">First Name</label>
-            <input name="first" onBlur={this.validateInput} placeholder="John" />
+            <input type="text" name="first" onBlur={this.validateInput} placeholder="John" />
+
             <label for="last">Last Name</label>
-            <input name="last" onBlur={this.validateInput} placeholder="Doe" />
+            <input type="text" name="last" onBlur={this.validateInput} placeholder="Doe" />
+
             <label for="email">Email</label>
-            <input name="email" onBlur={this.validateInput} placeholder="email@domain.com" />
+            <input type="text" name="email" onBlur={this.validateInput} placeholder="email@domain.com" />
+
             <label for="location">Location</label>
-            <input name="location" onBlur={this.validateInput} placeholder="Zip or City, ST" />
+            <input
+              type="text"
+              name="location"
+              onBlur={this.validateInput}
+              placeholder="Zip or City, ST" />
             {/* TODO: add city/state autocomplete */}
             {/* If user selects "skip" ask for location access and use their location */}
-            <Link to="/home"><button>Skip >>></button></Link>
+            <button
+              type="submit"
+              disabled={!this.state.submitEnabled && first && last && email && location}
+              onClick={this.submitForm}
+            >Search</button>
+            <Link to="/"><button>Skip >>></button></Link>
           </form>
+
         </div>
       </div>
     )

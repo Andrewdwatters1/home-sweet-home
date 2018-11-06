@@ -1,6 +1,6 @@
 .form-valid {
-  box-shadow: 0px 3px 3px rgb(1, 155, 1);
+  box-shadow: 0px 3px 1px rgb(1, 155, 1);
 }
 .form-invalid {
-  box-shadow: 0px 3px 3px red;
+  box-shadow: 0px 3px 1px rgb(255, 60, 0);
 }
