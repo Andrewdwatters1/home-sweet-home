@@ -2,12 +2,15 @@
   "name": "home-sweet-home",
   "version": "0.1.0",
   "private": true,
+  "main": "server/server.js",
   "dependencies": {
     "axios": "^0.18.0",
     "body-parser": "^1.18.3",
+    "circular-json": "^0.5.9",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "massive": "^5.5.1",
+    "node-zillow": "^2.0.0",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
     "react-redux": "^5.1.0",
@@ -30,5 +33,14 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "proxy": "http://localhost:3502",
+  "nodemonCongig": {
+    "ext": "js.sql",
+    "watch": "server",
+    "ignore": [
+      "src/*",
+      "public/*"
+    ]
+  }
 }
