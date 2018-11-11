@@ -15,12 +15,12 @@ class Home extends Component {
   zillow = () => {
     console.log('clicked');
     const parameters = {
-      address: "2114 Bigelow Ave",
-      citystatezip: "Seattle, WA",
+      address: "5069 Iron Horse Trail",
+      citystatezip: "Colorado Springs, CO",
       rentzestimate: false
     }
     axios.post('/api/getSearchResults', parameters).then(result => {
-      const {address, links, localRealEstate, zestimate, zpid} = result.data[0];
+      const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
       console.log(address);
       console.log(links);
       console.log(localRealEstate);
@@ -30,25 +30,31 @@ class Home extends Component {
     // if (!this.props.user.location) this.props.history.push('/form');
   }
   zillow2 = () => {
-    const parameters = {
-      state: "CO",
+    const stateParameters = {
+      state: this.props.user.state,
       childtype: "city"
     }
-    axios.post('/api/getRegionChildren', parameters).then(result => {
+    const cityParameters = {
+      state: this.props.user.state,
+      city: this.props.user.city,
+      childtype: "zipcode"
+    }
+    axios.post('/api/getRegionChildren', cityParameters).then(result => {
       console.log(result);
     }).catch(error => console.log(error));
   }
-  zippo = () => {
-    axios.get('http://api.zippopotam.us/us/80013').then(result => {
-      console.log(result);
-    })
+  testDF = () => {
+    axios.post('/api/testDF')
+      .then(result => console.log(result))
+      .catch(error => console.log('front-end error', error));
   }
 
   render() {
+    console.log(this.props.user)
     return (
       <div>
         <Search />
-        <button onClick={this.zippo}>zillow</button>
+        <button onClick={this.testDF}>zillow</button>
       </div>
     )
   }

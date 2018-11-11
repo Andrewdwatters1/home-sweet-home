@@ -6,7 +6,7 @@ require('dotenv').config()
 // const path = require('path');
 
 const userCtrl = require('./controllers/userCtrl');
-const propCtrl = require('./controllers/property');
+const propCtrl = require('./controllers/propertyCtrl');
 
 const serverPort = process.env.SERVER_PORT;
 const app = express();
@@ -26,10 +26,12 @@ app.use(bodyParser.json());
 //   res.sendFile(path.join(__dirname, '../build/index.html'));
 // });
 
+app.post('/api/getLocationInfo', userCtrl.getLocationInfo);
+app.post('/api/getCityFromZip', userCtrl.getCityFromZip);
 
 app.post('/api/getSearchResults', propCtrl.getSearchResults);
 app.post('/api/getRegionChildren', propCtrl.getRegionChildren);
-app.post('/api/getLocationInfo', userCtrl.getLocationInfo);
+app.post('/api/testDF', propCtrl.testDF);
 
 app.listen(serverPort, () => {
   console.log('Server listening on: ', serverPort);

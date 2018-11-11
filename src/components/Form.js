@@ -39,11 +39,18 @@ class Form extends Component {
     const { name, value } = e.target;
     this.setState({
       zip: value
-    });
-    const zipRegExp = /^\d{5}$|^\d{5}-{1}\d{4}$/;
+    })
 
-    if (zipRegExp.test(value)) this.validInput(e);
-    else this.invalidInput(name);
+    const zipRegExp = /^\d{5}$/;
+    if (zipRegExp.test(value)) {
+      this.validInput(e);
+      axios.post('/api/getCityFromZip', { value }).then(result => {
+        this.setState({
+          city: result.data['place name'],
+          state: result.data['state abbreviation']
+        })
+      })
+    } else this.invalidInput(name);
   }
 
   validateCity = (e) => {
