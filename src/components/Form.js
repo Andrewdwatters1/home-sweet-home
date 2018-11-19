@@ -21,78 +21,76 @@ class Form extends Component {
   validateName = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
+
     const nameRegExp = /^[A-Za-zÀ-ÿ ,.'-]+$/;
-    if (nameRegExp.test(value)) this.validInput(e)
-    else this.invalidInput(name);
+    if (nameRegExp.test(value)) this.inputIsValid(e)
+    else this.inputIsInvalid(name);
   }
 
   validateEmail = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
+
     const emailRegExp = /^.+\@[A-Za-z0-9\-]+\.com/;
-    if (emailRegExp.test(value)) this.validInput(e)
-    else this.invalidInput(name);
+    if (emailRegExp.test(value)) this.inputIsValid(e)
+    else this.inputIsInvalid(name);
   }
 
   validateZip = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    this.setState({
-      zip: value
-    })
+    this.setState({ zip: value })
 
     const zipRegExp = /^\d{5}$/;
     if (zipRegExp.test(value)) {
-      this.validInput(e);
-      axios.post('/api/getCityFromZip', { value }).then(result => {
-        this.setState({
-          city: result.data['place name'],
-          state: result.data['state abbreviation']
+      this.inputIsValid(e);
+      axios.post('/api/getCityFromZip', { value })
+        .then(result => {
+          this.setState({
+            city: result.data['place name'],
+            state: result.data['state abbreviation']
+          })
         })
-      })
-    } else this.invalidInput(name);
+    } else this.inputIsInvalid(name);
   }
 
   validateCity = (e) => {
     e.preventDefault()
     const { name, value } = e.target;
-    this.setState({
-      city: value
-    });
+    this.setState({ city: value });
+
     const cityRegExp = /^[A-Za-z\.\,\ ]+$/;
-    if (cityRegExp.test(value)) this.validInput(e);
-    else this.invalidInput(name);
+    if (cityRegExp.test(value)) this.inputIsValid(e);
+    else this.inputIsInvalid(name);
   }
 
   validateState = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    this.setState({
-      state: value
-    });
+    this.setState({ state: value });
+
     const stateRegExp = /^[A-Z]{2}$/i
-    if (stateRegExp.test(value)) this.validInput(e);
-    else this.invalidInput(name);
+    if (stateRegExp.test(value)) this.inputIsValid(e);
+    else this.inputIsInvalid(name);
   }
 
-  validInput = (e) => {
+  inputIsValid = (e) => {
     const { name } = e.target;
     this.props.updateUser(e);
+
     const tgtInput = document.querySelectorAll(`input[name="${name}"]`)[0]
     tgtInput.classList.add('form-valid')
     tgtInput.classList.remove('form-invalid')
-    this.setState({
-      submitEnabled: true
-    })
+
+    this.setState({ submitEnabled: true })
   }
 
-  invalidInput = name => {
+  inputIsInvalid = name => {
     const tgtInput = document.querySelectorAll(`input[name="${name}"]`)[0]
     tgtInput.classList.add('form-invalid');
     tgtInput.classList.remove('form-valid');
-    this.setState({
-      submitEnabled: false
-    })
+
+    this.setState({ submitEnabled: false })
   }
 
   submitForm = (e) => {
@@ -104,22 +102,27 @@ class Form extends Component {
   getLocationInfo = (position) => {
     const lat = position.coords.latitude;
     const long = position.coords.longitude;
-    axios.post('/api/getLocationInfo', { lat, long }).then(result => {
-      this.setState({
-        zip: result.data[0].address_components[7].long_name,
-        city: result.data[0].address_components[3].long_name,
-        state: result.data[0].address_components[5].short_name
-      }, () => {
-        const { zip, city, state } = this.state;
-        this.props.updateUserLocation({ zip, city, state })
-        const tgts = [
-          document.querySelectorAll(`input[name="zip"]`)[0],
-          document.querySelectorAll(`input[name="city"]`)[0],
-          document.querySelectorAll(`input[name="state"]`)[0]
-        ]
-        tgts.forEach((e) => e.classList.add('form-valid'))
+
+    axios.post('/api/getLocationInfo', { lat, long })
+      .then(result => {
+        this.setState({
+          zip: result.data[0].address_components[7].long_name,
+          city: result.data[0].address_components[3].long_name,
+          state: result.data[0].address_components[5].short_name
+        }, () => {
+          const { zip, city, state } = this.state;
+          this.props.updateUserLocation({ zip, city, state })
+
+          const tgts = [
+            document.querySelectorAll(`input[name="zip"]`)[0],
+            document.querySelectorAll(`input[name="city"]`)[0],
+            document.querySelectorAll(`input[name="state"]`)[0]
+          ]
+
+          tgts.forEach((e) => e.classList.add('form-valid'))
+        })
       })
-    }).catch(error => console.log('error in geolocation', error));
+      .catch(error => console.log('error in geolocation', error));
   }
 
   componentDidMount() {
@@ -131,19 +134,32 @@ class Form extends Component {
   render() {
     // console.log(this.props.user);
     const { first, last, email, city, state, zip } = this.props.user;
+
     return (
-      <div className="form-background">
-        <div className="form inner">
+      <div className="form-background" >
+        <div className="form inner" >
 
-          <form id="initial">
-            <label for="first">First Name</label>
-            <input type="text" name="first" onBlur={this.validateName} placeholder="John" />
+          <form id="initial" >
+            <label for="first"> First Name</label>
+            <input
+              type="text"
+              name="first"
+              onBlur={this.validateName}
+              placeholder="John" />
 
-            <label for="last">Last Name</label>
-            <input type="text" name="last" onBlur={this.validateName} placeholder="Doe" />
+            <label for="last">Last Name </label>
+            <input
+              type="text"
+              name="last"
+              onBlur={this.validateName}
+              placeholder="Doe" />
 
             <label for="email">Email</label>
-            <input type="text" name="email" onBlur={this.validateEmail} placeholder="email@domain.com" />
+            <input
+              type="text"
+              name="email"
+              onBlur={this.validateEmail}
+              placeholder="email@domain.com" />
 
             <div>
               <div>
@@ -174,15 +190,15 @@ class Form extends Component {
                   value={this.state.state} />
               </div>
             </div>
-            {/* TODO: add city/state autocomplete */}
+
             <button
               type="submit"
               disabled={!this.state.submitEnabled && first && last && email && city && state && zip}
-              onClick={this.submitForm}
-            >Search</button>
+              onClick={this.submitForm}>
+              Search
+            </button>
             <Link to="/"><button onClick={this.skipForm}>Skip >>></button></Link>
           </form>
-
         </div>
       </div>
     )

@@ -19,14 +19,16 @@ class Home extends Component {
       citystatezip: "Colorado Springs, CO",
       rentzestimate: false
     }
-    axios.post('/api/getSearchResults', parameters).then(result => {
-      const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
-      console.log(address);
-      console.log(links);
-      console.log(localRealEstate);
-      console.log(zestimate);
-      console.log(zpid);
-    }).catch(error => console.log(error));
+    axios.post('/api/getSearchResults', parameters)
+      .then(result => {
+        const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
+        console.log(address);
+        console.log(links);
+        console.log(localRealEstate);
+        console.log(zestimate);
+        console.log(zpid);
+      })
+      .catch(error => console.log(error));
     // if (!this.props.user.location) this.props.history.push('/form');
   }
   zillow2 = () => {
@@ -39,9 +41,11 @@ class Home extends Component {
       city: this.props.user.city,
       childtype: "zipcode"
     }
-    axios.post('/api/getRegionChildren', cityParameters).then(result => {
-      console.log(result);
-    }).catch(error => console.log(error));
+    axios.post('/api/getRegionChildren', stateParameters)
+      .then(result => {
+        console.log(result);
+      })
+      .catch(error => console.log(error));
   }
   testDF = () => {
     axios.post('/api/testDF')
@@ -54,7 +58,8 @@ class Home extends Component {
     return (
       <div>
         <Search />
-        <button onClick={this.testDF}>zillow</button>
+        <button
+          onClick={this.testDF}>zillow</button>
       </div>
     )
   }
