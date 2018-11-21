@@ -10,11 +10,14 @@ class Form extends Component {
     super(props)
     this.state = {
       submitEnabled: false,
+      requiredModal: false,
+      requiredValid: false,
       lat: '',
       long: '',
       zip: '',
       city: '',
       state: '',
+      stateReq: ''
     }
   }
 
@@ -49,6 +52,11 @@ class Form extends Component {
           this.setState({
             city: result.data['place name'],
             state: result.data['state abbreviation']
+          }, () => {
+            this.props.updateUserLocation({ city: this.state.city })
+            this.props.updateUserLocation({ state: this.state.state })
+            document.querySelectorAll(`input[name="city"]`)[0].classList.add('form-valid');
+            document.querySelectorAll(`input[name="state"]`)[0].classList.add('form-valid');
           })
         })
     } else this.inputIsInvalid(name);
@@ -67,9 +75,10 @@ class Form extends Component {
   validateState = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    this.setState({ state: value });
+    if (name === 'state') this.setState({ state: value });
+    else if (name === 'stateReq') this.setState({ stateReq: value });
 
-    const stateRegExp = /^[A-Z]{2}$/i
+    const stateRegExp = /^A[LKSZRAEP]$|^C[AOT]$|^D[EC]$|^F[LM]$|^G[AU]$|^HI$|^I[ADLN]$|^K[SY]$|^LA$|^M[ADEHINOPST]$|^N[CDEHJMVY]$|^O[HKR]$|^P[ARW]$|^RI$|^S[CD]$|^T[NX]$|^UT$|^V[AIT]$|^W[AIVY]$/i;
     if (stateRegExp.test(value)) this.inputIsValid(e);
     else this.inputIsInvalid(name);
   }
@@ -97,6 +106,13 @@ class Form extends Component {
     e.preventDefault();
     const { first, last, email, city, state, zip } = this.props.user;
     if (this.state.submitEnabled && first && last && email && city && state && zip) this.props.history.push('/');
+  }
+
+  skipForm = (e) => {
+    e.preventDefault();
+    this.setState({
+      requiredModal: !this.state.requiredModal
+    })
   }
 
   getLocationInfo = (position) => {
@@ -132,7 +148,7 @@ class Form extends Component {
   }
 
   render() {
-    // console.log(this.props.user);
+    console.log(this.props.user);
     const { first, last, email, city, state, zip } = this.props.user;
 
     return (
@@ -194,10 +210,26 @@ class Form extends Component {
             <button
               type="submit"
               disabled={!this.state.submitEnabled && first && last && email && city && state && zip}
-              onClick={this.submitForm}>
+              onClick={this.submitForm} >
               Search
             </button>
-            <Link to="/"><button onClick={this.skipForm}>Skip >>></button></Link>
+
+            <button onClick={this.skipForm}>Skip >>></button>
+
+            {this.state.requiredModal &&
+              <div>
+                <p>State is required</p>
+                <button onClick={this.skipForm}>x</button>
+                <input
+                  type="text"
+                  name="stateReq"
+                  onChange={this.validateState}
+                  placeholder="CA"
+                  value={this.state.stateReq}
+                  autoFocus />
+                <Link to="/" disabled={!this.state.submitEnabled}><button>Search</button></Link>
+              </div>
+            }
           </form>
         </div>
       </div>

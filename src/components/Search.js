@@ -6,9 +6,12 @@ class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      cities: [],
-      citiesDerivedFromZip: [],
-      statesDerivedFromZip: []
+      // populated with possible list of cities for user's state
+      citiesDerivedFromState: [],
+      // cities user has selected for query
+      citiesSelected: [],
+      bedroomsMin: "",
+      bedroomsMin: "",
     }
   }
 
@@ -37,34 +40,37 @@ class Search extends Component {
   //   // if (!this.props.user.location) this.props.history.push('/form');
   // }
 
-  // zillow2 = () => {
-  //   const stateParameters = {
-  //     state: this.props.user.state,
-  //     childtype: "city"
-  //   }
-  //   const cityParameters = {
-  //     state: this.props.user.state,
-  //     city: this.props.user.city,
-  //     childtype: "zipcode"
-  //   }
-  //   axios.post('/api/getRegionChildren', cityParameters).then(result => {
-  //     console.log(result);
-  //   }).catch(error => console.log(error));
-  // }
 
+  setBedroomsMin = (e) => {
+    this.setState({
+      bedroomsMin: e.target.value
+    })
+  }
 
+  setBedroomsMax = (e) => {
+    this.setState({
+      bedRoomsMax: e.target.value
+    })
+  }
 
+  getCitiesListFromState = () => {
+    const state = this.props.user.state || this.props.user.stateReq;
+    axios.post('/api/getRegionChildren', {
+      state: state,
+      childtype: "city"
+    }).then(result => {
+      this.setState({
+        citiesDerivedFromState: [...result.data.response.list.region]
+          .map(e => e = e.name[0])
+          .sort()
+      })
+    }).catch(error => console.log(error));
+  }
 
-
-  // styles input if valid
-  isInputValid = (tgt, bool) => {
-    if (bool) {
-      tgt.classList.add('form-valid')
-      tgt.classList.remove('form-invalid')
-    } else {
-      tgt.classList.remove('form-valid')
-      tgt.classList.add('form-invalid')
-    }
+  // DISPLAYS THE NEXT CITY SELECT INPUT TO POPULATE CITIES QUERY ARRAY
+  additionalCity = () => {
+    const nextInput = document.querySelectorAll('select[hidden]')[0];
+    if (nextInput) nextInput.removeAttribute('hidden');
   }
 
   testDF = () => {
@@ -73,37 +79,13 @@ class Search extends Component {
       .catch(error => console.log('front-end error', error));
   }
 
-  validateCityInput = (e) => {
-    e.preventDefault()
-    const {
-      name,
-      value
-    } = e.target;
-
-    const zipRegExp = /^\d{5}$/;
-    const cityRegExp = /^[A-Za-z\.\,\ ]+$/;
-
-    if (zipRegExp.test(value)) {
-      this.isInputValid(e.target, true);
-      axios.post('/api/getCityFromZip', {
-        value
-      }).then(result => {
-        this.setState({
-          citiesDerivedFromZip: [...this.state.citiesDerivedFromZip, result.data['place name']],
-          statesDerivedFromZip: [...this.state.statesDerivedFromZip, result.data['state abbreviation']]
-        });
-      });
-    } else if (cityRegExp.test(value)) {
-      // TODO MAKE THIS WORK.
-
-    } else this.isInputValid(e.target, false);
+  componentDidMount() {
+    if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
+    // TODO: else redirect back to form or otherwise get a state for the user
   }
 
-
   render() {
-    console.log(this.state.cities);
 
-    //TODO get this formatted correctly
     return (
       <div style={{
         display: "flex",
@@ -114,35 +96,83 @@ class Search extends Component {
         <h1>Headed Home</h1>
         <div>
           <div class="location-input">
-            {/* TODO these should all be select dropdown menus */}
-            {/* use zillow2 from line 44 passing stateParameters */}
 
-            <input name="cities[1]"
-              placeholder="Enter City"
-              onBlur={this.validateCityInput}
-              value={this.state.cities[0]} />
+            {/* TODO: THIS PROBABLY SHOULDN'T BE AN INPUT */}
+            <input
+              name="state"
+              placeholder="CA"
+              value={this.props.user.state ? this.props.user.state.toUpperCase() : this.props.user.stateReq ? this.props.user.stateReq.toUpperCase() : null}
+              disabled />
 
-            <input name="cities[2]"
-              hidden placeholder="Enter City"
-              onBlur={this.validateCityInput}
-              value={this.state.cities[0]} />
+            <select
+              value={this.state.citiesSelected[0]}
+              id="cities-selected-0">
+              <option value="" selected disabled hidden>select city</option>
+              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+            </select>
 
-            <input hidden placeholder="Enter City"
-              onBlur={this.validateCityInput}
-              value={this.state.cities[0]} />
+            <select
+              hidden
+              value={this.state.citiesSelected[1]}
+              name="cities-selected-1">
+              <option value="" selected disabled hidden>select city</option>
+              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+            </select>
 
-            <input hidden placeholder="Enter City"
-              onBlur={this.validateCityInput}
-              value={this.state.cities[0]} />
+            <select
+              hidden
+              value={this.state.citiesSelected[2]}
+              name="cities-selected-2">
+              <option value="" selected disabled hidden>select city</option>
+              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+            </select>
 
-            <input hidden placeholder="Enter City"
-              onBlur={this.validateCityInput}
-              value={this.state.cities[0]} />
+            <select
+              hidden
+              value={this.state.citiesSelected[3]}
+              name="cities-selected-3">
+              <option value="" selected disabled hidden>select city</option>
+              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+            </select>
 
-            <button onClick={this.addCity}>
+            <select
+              hidden
+              value={this.state.citiesSelected[4]}
+              name="cities-selected-4">
+              <option value="" selected disabled hidden>select city</option>
+              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+            </select>
+
+            {/* TODO: CURRENTLY DOES NOTHING */}
+            <button onClick={this.additionalCity}>
               <i>+</i>
             </button>
 
+
+            {/* TODO: MAX MUST BE GREATER THAN MIN, DISABLE OR HIDE MAX OPTIONS <= MIN OPTIONS */}
+            <label for="bedrooms"># bedrooms</label>
+            <section name="bedrooms">
+              <select name="bedrooms-min" onChange={this.setBedroomsMin}>
+                <option value="" selected disabled hidden>min</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5+</option>
+              </select>
+              <select name="bedrooms-max" onChange={this.setBedroomsMax}>
+                <option value="" selected disabled hidden>max</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5+">5+</option>
+              </select>
+            </section>
+
+
+
+            <button onClick={this.testDF}>Search</button>
           </div>
         </div>
       </div>
