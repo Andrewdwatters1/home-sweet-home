@@ -138,6 +138,7 @@ class Search extends Component {
   }
 
   checkStatusRequirement = (children) => {
+    children.pop();
     if (children.some(e => e.value === 'true')) this.setState({ statusSet: true })
     else this.setState({ statusSet: false })
   }
@@ -263,8 +264,8 @@ class Search extends Component {
                 <input type="checkbox" onChange={this.handleStatusChange} name="for-sale" value={this.state.forSale} />
                 <label for="for-rent">For Rent</label>
                 <input type="checkbox" onChange={this.handleStatusChange} name="for-rent" value={this.state.forRent} />
-                <label for="available">Available</label>
-                <input type="checkbox" onChange={this.handleStatusChange} name="available" value={this.state.isAvailable} />
+                <label for="available">Available Properties Only</label>
+                <input type="checkbox" onChange={this.handleStatusChange} name="available" value={this.state.isAvailable} defaultChecked/>
               </section>
             </div>
 
