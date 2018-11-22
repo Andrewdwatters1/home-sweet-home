@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 app.post('/api/getLocationInfo', userCtrl.getLocationInfo);
 app.post('/api/getCityFromZip', userCtrl.getCityFromZip);
 
-app.post('/api/getSearchResults', propCtrl.getSearchResults);
+app.post('/api/getSinglePropertySearchResults', propCtrl.getSinglePropertySearchResults);
 app.post('/api/getRegionChildren', propCtrl.getRegionChildren);
 app.post('/api/testDF', propCtrl.testDF);
 

@@ -34,7 +34,7 @@ class Form extends Component {
     e.preventDefault();
     const { name, value } = e.target;
 
-    const emailRegExp = /^.+\@[A-Za-z0-9\-]+\.com/;
+    const emailRegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i;
     if (emailRegExp.test(value)) this.inputIsValid(e)
     else this.inputIsInvalid(name);
   }
@@ -52,6 +52,7 @@ class Form extends Component {
           this.setState({
             city: result.data['place name'],
             state: result.data['state abbreviation']
+
           }, () => {
             this.props.updateUserLocation({ city: this.state.city })
             this.props.updateUserLocation({ state: this.state.state })
@@ -102,6 +103,7 @@ class Form extends Component {
     this.setState({ submitEnabled: false })
   }
 
+  // SEND USER'S INFO TO DB AND CAPTURE/GIVE COOKIE FOR FUTURE VISITS
   submitForm = (e) => {
     e.preventDefault();
     const { first, last, email, city, state, zip } = this.props.user;
@@ -125,6 +127,7 @@ class Form extends Component {
           zip: result.data[0].address_components[7].long_name,
           city: result.data[0].address_components[3].long_name,
           state: result.data[0].address_components[5].short_name
+
         }, () => {
           const { zip, city, state } = this.state;
           this.props.updateUserLocation({ zip, city, state })

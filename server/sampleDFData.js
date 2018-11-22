@@ -87,6 +87,9 @@ module.exports = {
 //   Tipi 
 //   Vacation Rental 
 //   Villa* 
+
+
+
 // -- POSSIBLE VALUES FOR "statuses.type":
 // Short Term Rental
 // Rental

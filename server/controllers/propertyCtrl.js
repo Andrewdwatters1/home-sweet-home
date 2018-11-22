@@ -53,7 +53,17 @@ module.exports = {
     //   else res.status(200).send(body);
     // })
   },
+
   getSearchResults: (req, res) => {
+    // city should include only searched cities => ex: "query": "city:Austin OR city:Houston"
+
+    // statuses.type should not include "Not for Sale"
+    // if "rent" should include "Short Term Rental", "Rental" and "Rent To Own"
+    // if "buy" should include "For Sale" and "Rent To Own"
+    // if "available" should not include statuses.isUnderContract = "true"
+    
+  },
+  getSinglePropertySearchResults: (req, res) => {
     zillow.get('GetSearchResults', req.body)
       .then(result => {
         console.log(result)

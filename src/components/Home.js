@@ -19,7 +19,7 @@ class Home extends Component {
       citystatezip: "Colorado Springs, CO",
       rentzestimate: false
     }
-    axios.post('/api/getSearchResults', parameters)
+    axios.post('/api/getSinglePropertySearchResults', parameters)
       .then(result => {
         const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
         console.log(address);
