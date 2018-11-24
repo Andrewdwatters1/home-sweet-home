@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
-import Search from './Search';
+import Searchbar from './Searchbar';
 
 class Home extends Component {
   constructor(props) {
@@ -57,7 +57,7 @@ class Home extends Component {
     console.log(this.props.user)
     return (
       <div>
-        <Search />
+        <Searchbar/>
         <button
           onClick={this.testDF}>zillow</button>
       </div>

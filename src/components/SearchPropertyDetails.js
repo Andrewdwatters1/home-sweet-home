@@ -221,11 +221,7 @@ class Search extends Component {
   render() {
     // console.log('state isssssssssssss', this.state);
     return (
-      <div style={{
-        display: "flex",
-        height: "160px",
-        backgroundColor: "red"
-      }}>
+      <div>
         <i>Logo</i>
         <h1>Home Sweet Home</h1>
 
@@ -348,15 +344,6 @@ class Search extends Component {
                 <label for="vacationOrOther">Vacation/Other</label>
                 <input type="checkbox" onChange={this.handlePropertyTypeChange} name="vacationOrOther" value={this.state.vacationOrOther} />
               </section>
-              {/* 
-              SINGLE FAMILY HOME
-              CONDO/TOWNHOME
-              APARTMENT/SINGLE UNIT
-              NEW BUILD
-              COMMERCIAL/RENTAL/INVESTMENT
-              LAND
-              VACATION/OTHER
-               */}
             </div>
 
             <div>
