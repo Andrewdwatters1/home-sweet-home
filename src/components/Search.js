@@ -10,18 +10,34 @@ class Search extends Component {
       // POSSIBLE CITIES FOR USER'S STATE
       citiesDerivedFromState: [],
 
-      // LOCATION
+      // ----- LOCATION
       citiesSelected: [],
       bedroomsMin: "",
       bedroomsMin: "",
 
-      // PROPERTY DETAILS
+      // ----- PROPERTY DETAILS
+      // STATUS
       forSale: false,
       forRent: false,
       isAvailable: false,
-
+      // PROPERTY TYPE
+      singleFamily: false,
+      condoOrTownhome: false,
+      apartment: false,
+      newBuild: false,
+      commercialOrInvestment: false,
+      vacationOrOther: false,
+      // PRICE RANGE
+      pricePossibleValues: ['50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'],
+      // maxPricePossibleValues: ['50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'],
+      minPriceIndex: 0,
+      minPrice: '',
+      maxPriceIndex: 0,
+      maxPrice: '',
       // REQUIRED FIELDS
-      statusSet: false
+      statusSet: false,
+      typeSet: false,
+      priceRangeSet: false,
 
 
     }
@@ -117,24 +133,15 @@ class Search extends Component {
 
 
   // -------------------- PROPERTY DETAILS -------------- // 
+  // PROPERTY STATUS
   handleStatusChange = (e) => {
     const { name, checked } = e.target;
     const childInputs = [...document.querySelector('section[name="status"]').children]
       .filter(e => e.nodeName === 'INPUT');
 
-    if (name === 'for-sale') {
-      this.setState({
-        forSale: checked
-      }, () => this.checkStatusRequirement(childInputs));
-    } else if (name === 'for-rent') {
-      this.setState({
-        forRent: checked
-      }, () => this.checkStatusRequirement(childInputs));
-    } else if (name === 'available') {
-      this.setState({
-        isAvailable: checked
-      }, () => this.checkStatusRequirement(childInputs));
-    }
+    this.setState({
+      [name]: checked
+    }, () => this.checkStatusRequirement(childInputs));
   }
 
   checkStatusRequirement = (children) => {
@@ -143,6 +150,39 @@ class Search extends Component {
     else this.setState({ statusSet: false })
   }
 
+  // PROPERTY TYPE
+  handlePropertyTypeChange = (e) => {
+    const { name, checked } = e.target;
+    const childInputs = [...document.querySelector('section[name="property-type"]').children]
+      .filter(e => e.nodeName === 'INPUT');
+    this.setState({
+      [name]: checked
+    }, () => this.checkTypeRequirement(childInputs))
+  }
+  checkTypeRequirement = (children) => {
+    if (children.some(e => e.value === 'true')) this.setState({ typeSet: true })
+    else this.setState({ typeSet: false })
+  }
+
+  // PRICE RANGE
+
+  handlePriceChange = (e) => {
+    const { name, value } = e.target;
+    const index = this.state.pricePossibleValues.findIndex(e => e === value);
+    const valueToSet = `${name}Index`;
+    console.log(valueToSet, ':', index);
+    this.setState({
+      [name]: value,
+      [valueToSet]: index
+    }, () => {
+      console.log('min price index', this.state.minPriceIndex);
+      console.log('max price index', this.state.maxPriceIndex);
+    })
+  }
+
+  // handleMaxPriceChange = (e) => {
+
+  // }
   // TODO: WORK ME AFTER PROPERTY DETAILS SECTION IS FINISHED
   setBedroomsMin = (e) => {
     const { name, value } = e.target;
@@ -179,7 +219,7 @@ class Search extends Component {
   }
 
   render() {
-    console.log('state isssssssssssss', this.state);
+    // console.log('state isssssssssssss', this.state);
     return (
       <div style={{
         display: "flex",
@@ -260,21 +300,63 @@ class Search extends Component {
             <div>
               <label for="status">Status</label>
               <section name="status">
-                <label for="for-sale">For Sale</label>
-                <input type="checkbox" onChange={this.handleStatusChange} name="for-sale" value={this.state.forSale} />
-                <label for="for-rent">For Rent</label>
-                <input type="checkbox" onChange={this.handleStatusChange} name="for-rent" value={this.state.forRent} />
-                <label for="available">Available Properties Only</label>
-                <input type="checkbox" onChange={this.handleStatusChange} name="available" value={this.state.isAvailable} defaultChecked/>
+                <label for="forSale">For Sale</label>
+                <input type="checkbox" onChange={this.handleStatusChange} name="forSale" value={this.state.forSale} />
+                <label for="forRent">For Rent</label>
+                <input type="checkbox" onChange={this.handleStatusChange} name="forRent" value={this.state.forRent} />
+                <label for="isAvailable">Available Properties Only</label>
+                <input type="checkbox" onChange={this.handleStatusChange} name="isAvailable" value={this.state.isAvailable} defaultChecked />
+              </section>
+            </div>
+
+            <div name="price">
+              {/* PRICES */}
+              <label for="price">Price</label>
+              <section>
+                <label for="minPrice">Min</label>
+                <select name="minPrice" onChange={this.handlePriceChange} value={this.state.minPrice}>
+                  <option value="noMin">No min</option>
+                  {[this.state.pricePossibleValues
+                    .filter((e, i) => this.state.maxPriceIndex > -1 ? i < this.state.maxPriceIndex : e)
+                    .map((elem, index) => <option key={index} value={elem}>${elem}</option>)]}
+                </select>
+                <label for="maxPrice">Max</label>
+                <select name="maxPrice" onChange={this.handlePriceChange} value={this.state.maxPrice}>
+                  <option value="noMax">No max</option>
+                  {[this.state.pricePossibleValues
+                    .filter((e, i) => this.state.minPriceIndex > 0 ? i > this.state.minPriceIndex : e)
+                    .map((elem, index) => <option key={index} value={elem}>${elem}</option>)]}
+                </select>
               </section>
             </div>
 
             <div>
-              {/* PRICES */}
-            </div>
-
-            <div>
-              {/* PROPERTY TYPE */}
+              <label for="property-type">Property Type</label>
+              <section name="property-type">
+                <label for="singleFamily">Single Family</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="singleFamily" value={this.state.singleFamily} />
+                <label for="condoOrTownhome">Condo/Townhome</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="condoOrTownhome" value={this.state.condoOrTownhome} />
+                <label for="apartment">Apartment/Room</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="apartment" value={this.state.apartment} />
+                <label for="newBuild">New Build</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="newBuild" value={this.state.newBuild} />
+                <label for="commercialOrInvestment">Commercial/Investment</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="commercialOrInvestment" value={this.state.commercialOrInvestment} />
+                <label for="land">Land</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="land" value={this.state.land} />
+                <label for="vacationOrOther">Vacation/Other</label>
+                <input type="checkbox" onChange={this.handlePropertyTypeChange} name="vacationOrOther" value={this.state.vacationOrOther} />
+              </section>
+              {/* 
+              SINGLE FAMILY HOME
+              CONDO/TOWNHOME
+              APARTMENT/SINGLE UNIT
+              NEW BUILD
+              COMMERCIAL/RENTAL/INVESTMENT
+              LAND
+              VACATION/OTHER
+               */}
             </div>
 
             <div>
