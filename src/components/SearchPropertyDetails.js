@@ -10,16 +10,14 @@ class Search extends Component {
       // POSSIBLE CITIES FOR USER'S STATE
       citiesDerivedFromState: [],
 
-      // ----- LOCATION
+      // LOCATION
       citiesSelected: [],
-      bedroomsMin: "",
-      bedroomsMin: "",
 
-      // ----- PROPERTY DETAILS
       // STATUS
       forSale: false,
       forRent: false,
       isAvailable: false,
+
       // PROPERTY TYPE
       singleFamily: false,
       condoOrTownhome: false,
@@ -27,13 +25,14 @@ class Search extends Component {
       newBuild: false,
       commercialOrInvestment: false,
       vacationOrOther: false,
+
       // PRICE RANGE
       pricePossibleValues: ['50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'],
-      // maxPricePossibleValues: ['50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'],
-      minPriceIndex: 0,
+      minPriceIndex: -1,
       minPrice: '',
-      maxPriceIndex: 0,
+      maxPriceIndex: -1,
       maxPrice: '',
+
       // REQUIRED FIELDS
       statusSet: false,
       typeSet: false,
@@ -50,23 +49,23 @@ class Search extends Component {
   // ex query to search date range: "query": "dateAdded:[2017-01-01 TO 2017-02-01]"
   // ex query to search unbounded date range: "query": "dateAdded:[2017-01-01 TO *]"
 
-  // zillow = () => {
-  //   console.log('clicked');
-  //   const parameters = {
-  //     address: "5069 Iron Horse Trail",
-  //     citystatezip: "Colorado Springs, CO",
-  //     rentzestimate: false
-  //   }
-  //   axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
-  //     const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
-  //     console.log(address);
-  //     console.log(links);
-  //     console.log(localRealEstate);
-  //     console.log(zestimate);
-  //     console.log(zpid);
-  //   }).catch(error => console.log(error));
-  //   // if (!this.props.user.location) this.props.history.push('/form');
-  // }
+  zillow = () => {
+    console.log('clicked');
+    const parameters = {
+      address: "5069 Iron Horse Trail",
+      citystatezip: "Colorado Springs, CO",
+      rentzestimate: false
+    }
+    axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
+      const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
+      console.log(address);
+      console.log(links);
+      console.log(localRealEstate);
+      console.log(zestimate);
+      console.log(zpid);
+    }).catch(error => console.log(error));
+    // if (!this.props.user.location) this.props.history.push('/form');
+  }
 
 
 
@@ -123,17 +122,16 @@ class Search extends Component {
     const { value, id } = e.target;
     const citiesList = [...this.state.citiesSelected];
     citiesList[id[+id.length - 1]] = value;
-    this.setState({ citiesSelected: citiesList });
+    this.setState({
+      citiesSelected: citiesList
+    }, () => this.checkLocationRequirement());
   }
   // -------------- LOCATION --------------------- // 
 
 
 
 
-
-
-  // -------------------- PROPERTY DETAILS -------------- // 
-  // PROPERTY STATUS
+  // -------------- STATUS --------------------- // 
   handleStatusChange = (e) => {
     const { name, checked } = e.target;
     const childInputs = [...document.querySelector('section[name="status"]').children]
@@ -149,8 +147,14 @@ class Search extends Component {
     if (children.some(e => e.value === 'true')) this.setState({ statusSet: true })
     else this.setState({ statusSet: false })
   }
+  // -------------- STATUS --------------------- // 
 
-  // PROPERTY TYPE
+
+
+
+
+
+  // -------------- TYPE --------------------- // 
   handlePropertyTypeChange = (e) => {
     const { name, checked } = e.target;
     const childInputs = [...document.querySelector('section[name="property-type"]').children]
@@ -159,13 +163,18 @@ class Search extends Component {
       [name]: checked
     }, () => this.checkTypeRequirement(childInputs))
   }
+
   checkTypeRequirement = (children) => {
     if (children.some(e => e.value === 'true')) this.setState({ typeSet: true })
     else this.setState({ typeSet: false })
   }
+  // -------------- TYPE --------------------- // 
 
-  // PRICE RANGE
 
+
+
+
+  // -------------- PRICE --------------------- // 
   handlePriceChange = (e) => {
     const { name, value } = e.target;
     const index = this.state.pricePossibleValues.findIndex(e => e === value);
@@ -179,28 +188,7 @@ class Search extends Component {
       console.log('max price index', this.state.maxPriceIndex);
     })
   }
-
-  // handleMaxPriceChange = (e) => {
-
-  // }
-  // TODO: WORK ME AFTER PROPERTY DETAILS SECTION IS FINISHED
-  setBedroomsMin = (e) => {
-    const { name, value } = e.target;
-    const max = document.querySelector('#bedrooms-max');
-    console.log(max);
-    // if value === 3 => max innerHTML = 4, 5
-    // else if value === 1 => max inner HTML = 2, 3, 4, 5
-    this.setState({
-      bedroomsMin: value
-    })
-  }
-
-  setBedroomsMax = (e) => {
-    this.setState({
-      bedRoomsMax: e.target.value
-    })
-  }
-  // -------------------- PROPERTY DETAILS -------------- // 
+  // -------------- PRICE --------------------- // 
 
 
 
@@ -242,46 +230,62 @@ class Search extends Component {
               onChange={this.updateCitiesList}
               id="cities-list-0">
               <option value="" selected disabled hidden>select city</option>
-              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+              [{this.state.citiesDerivedFromState
+                .map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
             </select>
+
             <select
               hidden
               value={this.state.citiesSelected[1]}
               onChange={this.updateCitiesList}
               id="cities-list-1">
               <option value="" selected disabled hidden>select city</option>
-              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+              [{this.state.citiesDerivedFromState
+                .map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
             </select>
-            <button hidden onClick={(id) => this.removeCityFromList(1)} id="cities-button-1"><i>-</i></button>
+            <button hidden onClick={(id) => this.removeCityFromList(1)} id="cities-button-1">
+              <i>-</i>
+            </button>
+
             <select
               hidden
               value={this.state.citiesSelected[2]}
               onChange={this.updateCitiesList}
               id="cities-list-2">
               <option value="" selected disabled hidden>select city</option>
-              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+              [{this.state.citiesDerivedFromState
+                .map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
             </select>
-            <button hidden onClick={(id) => this.removeCityFromList(2)} id="cities-button-2"><i>-</i></button>
+            <button hidden onClick={(id) => this.removeCityFromList(2)} id="cities-button-2">
+              <i>-</i>
+            </button>
+
             <select
               hidden
               value={this.state.citiesSelected[3]}
               onChange={this.updateCitiesList}
               id="cities-list-3">
               <option value="" selected disabled hidden>select city</option>
-              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+              [{this.state.citiesDerivedFromState
+                .map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
             </select>
-            <button hidden onClick={(id) => this.removeCityFromList(3)} id="cities-button-3"><i>-</i></button>
+            <button hidden onClick={(id) => this.removeCityFromList(3)} id="cities-button-3">
+              <i>-</i>
+            </button>
+
             <select
               hidden
               value={this.state.citiesSelected[4]}
               onChange={this.updateCitiesList}
               id="cities-list-4">
               <option value="" selected disabled hidden>select city</option>
-              [{this.state.citiesDerivedFromState.map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
+              [{this.state.citiesDerivedFromState
+                .map((e, i) => e = <option key={i} value={e}>{e}</option>)}]
             </select>
-            <button hidden onClick={(id) => this.removeCityFromList(4)} id="cities-button-4"><i>-</i></button>
+            <button hidden onClick={(id) => this.removeCityFromList(4)} id="cities-button-4">
+              <i>-</i>
+            </button>
 
-            {/* TODO: CURRENTLY DOES NOTHING */}
             <button onClick={this.additionalCity}>
               <i>+</i>
             </button>
@@ -313,14 +317,14 @@ class Search extends Component {
                 <select name="minPrice" onChange={this.handlePriceChange} value={this.state.minPrice}>
                   <option value="noMin">No min</option>
                   {[this.state.pricePossibleValues
-                    .filter((e, i) => this.state.maxPriceIndex > -1 ? i < this.state.maxPriceIndex : e)
+                    .filter((e, i) => this.state.maxPriceIndex > 0 ? i < this.state.maxPriceIndex : e)
                     .map((elem, index) => <option key={index} value={elem}>${elem}</option>)]}
                 </select>
                 <label for="maxPrice">Max</label>
                 <select name="maxPrice" onChange={this.handlePriceChange} value={this.state.maxPrice}>
                   <option value="noMax">No max</option>
                   {[this.state.pricePossibleValues
-                    .filter((e, i) => this.state.minPriceIndex > 0 ? i > this.state.minPriceIndex : e)
+                    .filter((e, i) => this.state.minPriceIndex > -1 ? i > this.state.minPriceIndex : e)
                     .map((elem, index) => <option key={index} value={elem}>${elem}</option>)]}
                 </select>
               </section>
@@ -353,39 +357,10 @@ class Search extends Component {
             <div>
               {/* FEES/HOA/ETC */}
             </div>
-
           </div>
 
 
-
-
-
-          {/* TODO: MAX MUST BE GREATER THAN MIN, DISABLE OR HIDE MAX OPTIONS <= MIN OPTIONS */}
-          <label for="bedrooms"># bedrooms</label>
-          <section name="bedrooms">
-            <select name="bedrooms-min" onChange={this.setBedroomsMin} id="bedrooms-min">
-              [<option value="" selected disabled hidden>min</option>
-              <option value="Studio">Studio</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5+">5+</option>]
-              </select>
-            <select name="bedrooms-max" onChange={this.setBedroomsMax} id="bedrooms-min">
-              [<option value="" selected disabled hidden>max</option>
-              <option value="Studio">Studio</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5+">5+</option>]
-              </select>
-          </section>
-
-
-
-          <button onClick={this.testDF}>Search</button>
+          <button onClick={this.zillow}>ZILLOW BABAYYYYYY</button>
         </div>
       </div>
     )

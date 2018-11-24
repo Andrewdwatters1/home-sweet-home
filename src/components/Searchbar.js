@@ -18,7 +18,7 @@ class Searchbar extends Component {
         backgroundColor: "aqua"
       }}>
         <SearchPropertyDetails />
-        {/* <SearchPropertyAmmenities /> */}
+        <SearchPropertyAmmenities />
         {/* <SearchByAddressOrMLS /> */}
       </div>
     )
@@ -30,4 +30,5 @@ const mapStateToProps = state => {
     user: state.user
   }
 }
+
 export default connect(mapStateToProps)(Searchbar);
