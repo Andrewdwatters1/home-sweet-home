@@ -2,7 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
-class Search extends Component {
+import { updateQuery } from '../redux/reducers/query';
+
+class SearchPropertyDetails extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -28,16 +30,13 @@ class Search extends Component {
 
       // PRICE RANGE
       pricePossibleValues: ['50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'],
-      minPriceIndex: -1,
+      minPriceIndex: 0,
       minPrice: '',
-      maxPriceIndex: -1,
+      maxPriceIndex: 0,
       maxPrice: '',
 
       // DATE
-      listedToday: false,
-      listedLast7: false,
-      listedLast30: false,
-      listedAnytime: true,
+      dateListed: "Anytime",
 
       // REQUIRED FIELDS
       locationSet: false,
@@ -49,23 +48,29 @@ class Search extends Component {
   }
 
   getCitiesListFromState = () => {
-    // const state = this.props.user.state || this.props.user.stateReq;
-    // axios.post('/api/getRegionChildren', {
-    //   state: state,
-    //   childtype: "city"
-    // }).then(result => {
-    //   this.setState({
-    //     citiesDerivedFromState: [...result.data.response.list.region]
-    //       .map(e => e = e.name[0])
-    //       .sort()
-    //   })
-    // }).catch(error => console.log(error));
-    this.setState({
-      citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins']
-    })
+    const state = this.props.user.state || this.props.user.stateReq;
+    axios.post('/api/getRegionChildren', {
+      state: state,
+      childtype: "city"
+    }).then(result => {
+      this.setState({
+        citiesDerivedFromState: [...result.data.response.list.region]
+          .map(e => e = e.name[0])
+          .sort()
+      })
+    }).catch(error => console.log(error));
+    // this.setState({ citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins'] })
   }
 
 
+  updateQuery = () => {
+    this.props.updateQuery({
+      details: Object.entries(this.state)
+        .filter(e => e[1] && e[0] !== "citiesDerivedFromState" && e[0] !== "pricePossibleValues")
+    })
+    // console.log(...Object.entries(this.state)
+    //   .filter(e => e[1] && e[0] !== "citiesDerivedFromState" && e[0] !== "pricePossibleValues"))
+  }
 
   // -------------- LOCATION --------------------- // 
   additionalCity = () => {
@@ -74,8 +79,10 @@ class Search extends Component {
       divChildren.find(e => e.nodeName === "SELECT" && e.hidden == true),
       divChildren.find(e => e.nodeName === "BUTTON" && e.hidden == true)
     ]
-    if (tgts[0] !== undefined) tgts.forEach(e => e.removeAttribute('hidden'))
-    else alert('Only 5 cities allowed'); // make better
+    if (tgts[0] !== undefined) {
+      tgts.forEach(e => e.removeAttribute('hidden'))
+      tgts[0].focus()
+    } else alert('Only 5 cities allowed'); // make better
   }
 
   removeCityFromList = id => {
@@ -88,7 +95,7 @@ class Search extends Component {
     citiesList.splice(id, 1);
     this.setState({
       citiesSelected: citiesList
-    })
+    }, () => this.updateQuery())
   }
 
   updateCitiesList = (e) => {
@@ -97,12 +104,22 @@ class Search extends Component {
     citiesList[id[+id.length - 1]] = value;
     this.setState({
       citiesSelected: citiesList
-    }, () => this.checkLocationRequirement());
+    }, () => {
+      this.checkLocationRequirement()
+      this.updateQuery()
+    });
   }
 
   checkLocationRequirement = () => {
-    if (this.state.citiesSelected.some(e => e)) this.setState({ locationSet: true });
-    else this.setState({ locationSet: false });
+    if (this.state.citiesSelected.some(e => e)) {
+      this.setState({
+        locationSet: true
+      }, () => this.updateQuery());
+    } else {
+      this.setState({
+        locationSet: false
+      });
+    }
   }
 
 
@@ -115,8 +132,11 @@ class Search extends Component {
   }
 
   checkStatusRequirement = () => {
-    if (this.state.forSale || this.state.forRent) this.setState({ statusSet: true })
-    else this.setState({ statusSet: false })
+    if (this.state.forSale || this.state.forRent) {
+      this.setState({
+        statusSet: true
+      }, () => this.updateQuery())
+    } else this.setState({ statusSet: false })
   }
 
 
@@ -130,8 +150,11 @@ class Search extends Component {
 
   checkTypeRequirement = () => {
     const { singleFamily, condoOrTownhome, apartment, newBuild, commercialOrInvestment, vacationOrOther } = this.state;
-    if (singleFamily || condoOrTownhome || apartment || newBuild || commercialOrInvestment || vacationOrOther) this.setState({ typeSet: true })
-    else this.setState({ typeSet: false })
+    if (singleFamily || condoOrTownhome || apartment || newBuild || commercialOrInvestment || vacationOrOther) {
+      this.setState({
+        typeSet: true
+      }, () => this.updateQuery());
+    } else this.setState({ typeSet: false })
   }
 
 
@@ -147,18 +170,22 @@ class Search extends Component {
   }
 
   checkPriceRequirement = () => {
-    if (this.state.minPrice || this.state.maxPrice) this.setState({ priceRangeSet: true });
-    else this.setState({ priceRangeSet: false })
+    if (this.state.minPrice || this.state.maxPrice) {
+      this.setState({
+        priceRangeSet: true
+      }, () => this.updateQuery());
+    } else this.setState({ priceRangeSet: false })
   }
 
 
   // -------------- DATE --------------------- // 
   handleDateChange = (e) => {
-    const { name, checked } = e.target;
+    const { name, value } = e.target;
     this.setState({
-      [name]: checked
-    });
+      [name]: value
+    }, () => this.updateQuery());
   }
+
 
 
   // testDF = () => {
@@ -168,13 +195,12 @@ class Search extends Component {
   // }
 
   componentDidMount() {
-    // if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
-    this.getCitiesListFromState(); // REMOVE ME
+    if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
+    // this.getCitiesListFromState(); // REMOVE ME
     // TODO: else redirect back to form or otherwise get a state for the user
   }
 
   render() {
-    console.log('state isssssssssssss', this.state);
     return (
       <div>
         <h2>Property Details</h2>
@@ -193,6 +219,7 @@ class Search extends Component {
               value={this.state.citiesSelected[0]}
               required
               onChange={this.updateCitiesList}
+              onFocus={this.updateCitiesList}
               id="cities-list-0">
               <option value="" selected disabled hidden>select city</option>
               [{this.state.citiesDerivedFromState
@@ -203,6 +230,7 @@ class Search extends Component {
               hidden
               value={this.state.citiesSelected[1]}
               onChange={this.updateCitiesList}
+              onFocus={this.updateCitiesList}
               id="cities-list-1">
               <option value="" selected disabled hidden>select city</option>
               [{this.state.citiesDerivedFromState
@@ -216,6 +244,7 @@ class Search extends Component {
               hidden
               value={this.state.citiesSelected[2]}
               onChange={this.updateCitiesList}
+              onFocus={this.updateCitiesList}
               id="cities-list-2">
               <option value="" selected disabled hidden>select city</option>
               [{this.state.citiesDerivedFromState
@@ -229,6 +258,7 @@ class Search extends Component {
               hidden
               value={this.state.citiesSelected[3]}
               onChange={this.updateCitiesList}
+              onFocus={this.updateCitiesList}
               id="cities-list-3">
               <option value="" selected disabled hidden>select city</option>
               [{this.state.citiesDerivedFromState
@@ -242,6 +272,7 @@ class Search extends Component {
               hidden
               value={this.state.citiesSelected[4]}
               onChange={this.updateCitiesList}
+              onFocus={this.updateCitiesList}
               id="cities-list-4">
               <option value="" selected disabled hidden>select city</option>
               [{this.state.citiesDerivedFromState
@@ -260,7 +291,7 @@ class Search extends Component {
 
 
           <div name="property-details">
-            <label for="property-details">Propety Details</label>
+            <label for="property-details">Property Details</label>
 
             <div>
               <label for="status">Status</label>
@@ -317,19 +348,19 @@ class Search extends Component {
             <div>
               <label for="dates">Date Added</label>
               <section name="dates">
-                <label for="listedToday">Today</label>
-                <input type="checkbox" name="listedToday" onChange={this.handleDateChange} value={this.state.listedToday} />
-                <label for="listedLast7">Last 7 Days</label>
-                <input type="checkbox" name="listedLast7" onChange={this.handleDateChange} value={this.state.listedLast7} />
-                <label for="listedLast30">Last 30 Days</label>
-                <input type="checkbox" name="listedLast30" onChange={this.handleDateChange} value={this.state.listedLast30} />
-                <label for="listedAnytime">Anytime</label>
-                <input type="checkbox" name="listedAnytime" onChange={this.handleDateChange} value={this.state.listedAnytime} defaultChecked />
+                <label for="today">Today</label>
+                <input type="radio" name="dateListed" onChange={this.handleDateChange} value="today" />
+                <label for="week">Last 7 Days</label>
+                <input type="radio" name="dateListed" onChange={this.handleDateChange} value="week" />
+                <label for="month">Last 30 Days</label>
+                <input type="radio" name="dateListed" onChange={this.handleDateChange} value="month" />
+                <label for="anytime">Anytime</label>
+                <input type="radio" name="dateListed" onChange={this.handleDateChange} value="anytime" defaultChecked />
               </section>
             </div>
           </div>
 
-          <button onClick={this.zillow}>ZILLOW BABAYYYYYY</button>
+          {/* <button onClick={() => this.props.submitPropertySearch(this.state)}>SEARCH</button> */}
         </div>
       </div>
     )
@@ -338,7 +369,8 @@ class Search extends Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.user
+    user: state.user,
+    query: state.query
   }
 }
-export default connect(mapStateToProps)(Search);
+export default connect(mapStateToProps, { updateQuery })(SearchPropertyDetails);

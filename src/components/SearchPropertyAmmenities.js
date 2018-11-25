@@ -2,15 +2,17 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
+import { updateQuery } from '../redux/reducers/query';
+
 class SearchPropertyAmmenities extends Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props)
     this.state = {
       // BEDS
       bedsPossValues: ['Studio', '1', '2', '3', '4', '5+'],
-      bedsMinIndex: -1,
+      bedsMinIndex: 0,
       bedsMin: "",
-      bedsMaxIndex: -1,
+      bedsMaxIndex: 0,
       bedsMin: "",
 
       // BATHS
@@ -18,16 +20,16 @@ class SearchPropertyAmmenities extends Component {
 
       // SQUARE FEET
       sqftPossValues: ['500', '600', '700', '800', '900', '1,000', '1,250', '1,500', '1,750', '2,000', '2,250', '2,500', '2,750', '3,000', '3,500', '4,000', '4,500', '5,000+'],
-      sqftMinIndex: -1,
+      sqftMinIndex: 0,
       sqftMin: "",
-      sqftMaxIndex: -1,
+      sqftMaxIndex: 0,
       sqftMin: "",
 
       // LOT SIZE
       lotSizePossValues: ['2,000 sq ft', '4,000 sq ft', '6,000 sq ft', '8,000 sq ft', '.25 acres', '.5 acres', '.75 acres', '1 acre', '1.5 acres', '2 acres', '3 acres', '4 acres', '5 acres', '10 acres', '20 acres', '50 acres+'],
-      lotSizeMinIndex: -1,
+      lotSizeMinIndex: 0,
       lotSizeMin: "",
-      lotSizeMaxIndex: -1,
+      lotSizeMaxIndex: 0,
       lotSizeMin: "",
 
       // PARKING
@@ -42,66 +44,40 @@ class SearchPropertyAmmenities extends Component {
     }
   }
 
-  handleBedsChange = (e) => {
+  updateQuery = () => {
+    this.props.updateQuery({
+      ammenities: Object.entries(this.state)
+        .filter(e => e[1] && e[0] !== "bedsPossValues" && e[0] !== "sqftPossValues" && e[0] !== "lotSizePossValues")
+    })
+  }
+
+  handleIndexedChange = (e) => {
     const { name, value } = e.target;
-    const index = this.state.bedsPossValues.findIndex(e => e === value);
+    const bedsRegEx = /^beds.*/;
+    const sqftRegEx = /^sqft.*/;
+    const lotRegEx = /^lotSize.*/;
     const valueToSet = `${name}Index`;
+    let index;
+
+    if (bedsRegEx.test(name)) index = this.state.bedsPossValues.findIndex(e => e === value);
+    else if (sqftRegEx.test(name)) index = this.state.sqftPossValues.findIndex(e => e === value);
+    else if (lotRegEx.test(name)) index = this.state.lotSizePossValues.findIndex(e => e === value);
+
     this.setState({
       [name]: value,
       [valueToSet]: index
-    })
+    }, () => this.updateQuery());
   }
 
-  handleBathsChange = (e) => {
-    const { name, value } = e.target;
+  handleChange = (e) => {
+    // console.log(e.target)
+    const { name, value, type, checked } = e.target;
     this.setState({
-      [name]: value
-    })
-  }
-
-  handleSqftChange = (e) => {
-    const { name, value } = e.target;
-    const index = this.state.sqftPossValues.findIndex(e => e === value);
-    const valueToSet = `${name}Index`;
-    this.setState({
-      [name]: value,
-      [valueToSet]: index
-    })
-  }
-
-  handleLotSizeChange = (e) => {
-    const { name, value } = e.target;
-    const index = this.state.lotSizePossValues.findIndex(e => e === value);
-    const valueToSet = `${name}Index`;
-    this.setState({
-      [name]: value,
-      [valueToSet]: index
-    })
-  }
-
-  handleParkingChange = (e) => {
-    const { name, value } = e.target;
-    this.setState({
-      [name]: value
-    })
-  }
-
-  handlePetsChange = (e) => {
-    const { name, checked } = e.target;
-    this.setState({
-      [name]: checked
-    })
-  }
-
-  handleFeesChange = (e) => {
-    const { name, value } = e.target;
-    this.setState({
-      [name]: value
-    })
+      [name]: type === 'checkbox' ? checked : value
+    }, () => this.updateQuery());
   }
 
   render() {
-    console.log(this.state);
     return (
       <div>
         <h2>Property Ammenities/Features</h2>
@@ -110,7 +86,7 @@ class SearchPropertyAmmenities extends Component {
           <label for="bedrooms"># bedrooms</label>
 
           <label for="bedsMin">Min</label>
-          <select name="bedsMin" onChange={this.handleBedsChange} value={this.state.bedsMin}>
+          <select name="bedsMin" onChange={this.handleIndexedChange} value={this.state.bedsMin}>
             <option value="">No min</option>
             {this.state.bedsPossValues
               .filter((e, i) => this.state.bedsMaxIndex > 0 ? i < this.state.bedsMaxIndex : e)
@@ -118,7 +94,7 @@ class SearchPropertyAmmenities extends Component {
           </select>
 
           <label for="bedsMax">Max</label>
-          <select name="bedsMax" onChange={this.handleBedsChange} value={this.state.bedsMax}>
+          <select name="bedsMax" onChange={this.handleIndexedChange} value={this.state.bedsMax}>
             <option value="">No max</option>
             {this.state.bedsPossValues
               .filter((e, i) => this.state.bedsMinIndex > -1 ? i > this.state.bedsMinIndex : e)
@@ -129,7 +105,7 @@ class SearchPropertyAmmenities extends Component {
 
         <div name="bathrooms">
           <label for="bathrooms"># bathrooms</label>
-          <select name="baths" onChange={this.handleBathsChange} value={this.state.baths}>
+          <select name="baths" onChange={this.handleChange} value={this.state.baths}>
             <option value="" defaultValue>No min</option>
             <option value="1">1+</option>
             <option value="1.25">1.25+</option>
@@ -145,14 +121,14 @@ class SearchPropertyAmmenities extends Component {
           <label for="square-feet">Square Feet</label>
 
           <label for="sqftMin">Min</label>
-          <select name="sqftMin" onChange={this.handleSqftChange} value={this.state.sqftMin}>
+          <select name="sqftMin" onChange={this.handleIndexedChange} value={this.state.sqftMin}>
             <option value="">No min</option>
             {this.state.sqftPossValues
               .filter((e, i) => this.state.sqftMaxIndex > 0 ? i < this.state.sqftMaxIndex : e)
               .map((elem, index) => <option key={index} value={elem}>{elem}</option>)}
           </select>
           <label for="sqftMax">Max</label>
-          <select name="sqftMax" onChange={this.handleSqftChange} value={this.state.sqftMax}>
+          <select name="sqftMax" onChange={this.handleIndexedChange} value={this.state.sqftMax}>
             <option value="">No max</option>
             {this.state.sqftPossValues
               .filter((e, i) => this.state.sqftMinIndex > -1 ? i > this.state.sqftMinIndex : e)
@@ -165,14 +141,14 @@ class SearchPropertyAmmenities extends Component {
           <label for="lot-size">Lot Size</label>
 
           <label for="lotSizeMin">Min</label>
-          <select name="lotSizeMin" onChange={this.handleLotSizeChange} value={this.state.lotSizeMin}>
+          <select name="lotSizeMin" onChange={this.handleIndexedChange} value={this.state.lotSizeMin}>
             <option value="">No min</option>
             {this.state.lotSizePossValues
               .filter((e, i) => this.state.lotSizeMaxIndex > 0 ? i < this.state.lotSizeMaxIndex : e)
               .map((elem, index) => <option key={index} value={elem}>{elem}</option>)}
           </select>
           <label for="lotSizeMax">Max</label>
-          <select name="lotSizeMax" onChange={this.handlelotSizeChange} value={this.state.lotSizeMax}>
+          <select name="lotSizeMax" onChange={this.handleIndexedChange} value={this.state.lotSizeMax}>
             <option value="">No max</option>
             {this.state.lotSizePossValues
               .filter((e, i) => this.state.lotSizeMinIndex > -1 ? i > this.state.lotSizeMinIndex : e)
@@ -183,7 +159,7 @@ class SearchPropertyAmmenities extends Component {
 
         <div name="parking">
           <label for="parking">Parking Spaces</label>
-          <select name="parkingSpaces" onChange={this.handleParkingChange} value={this.state.parkingSpaces}>
+          <select name="parkingSpaces" onChange={this.handleChange} value={this.state.parkingSpaces}>
             <option value="" defaultValue>No min</option>
             <option value="1">1+</option>
             <option value="2">2+</option>
@@ -196,7 +172,7 @@ class SearchPropertyAmmenities extends Component {
 
         <div>
           <label for="pets">Pets Allowed</label>
-          <input name="pets" type="checkbox" value={this.state.pets} onChange={this.handlePetsChange} />
+          <input name="pets" type="checkbox" checked={this.state.pets} onChange={this.handleChange} />
         </div>
 
 
@@ -207,7 +183,7 @@ class SearchPropertyAmmenities extends Component {
 
         <div>
           <label for="fees">Max Fees/HOA</label>
-          <select value={this.state.fees} onChange={this.handleFeesChange} name="fees">
+          <select value={this.state.fees} onChange={this.handleChange} name="fees">
             <option value="">No max</option>
             <option value="0">No Fees/HOA</option>
             <option value="25">$25/month</option>
@@ -227,6 +203,9 @@ class SearchPropertyAmmenities extends Component {
             <option value="1000">$1000/month</option>
           </select>
         </div>
+
+
+        {/* <button onClick={() => this.props.submitPropertySearch(this.state)}>SEARCH</button> */}
       </div>
     )
   }
@@ -234,10 +213,11 @@ class SearchPropertyAmmenities extends Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.user
+    user: state.user,
+    query: state.query
   }
 }
 
-export default connect(mapStateToProps)(SearchPropertyAmmenities);
+export default connect(mapStateToProps, { updateQuery })(SearchPropertyAmmenities);
 
 

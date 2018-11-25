@@ -10,6 +10,11 @@ class Searchbar extends Component {
   constructor() {
     super()
   }
+
+  validateAndSubmitQuery = () => {
+    console.log('QUERY', this.props.query)
+    console.log('USER', this.props.user)
+  }
   render() {
     return (
       <div style={{
@@ -20,6 +25,7 @@ class Searchbar extends Component {
         <SearchPropertyDetails />
         <SearchPropertyAmmenities />
         {/* <SearchByAddressOrMLS /> */}
+        <button onClick={this.validateAndSubmitQuery}>SEARCH</button>
       </div>
     )
   }
@@ -27,7 +33,8 @@ class Searchbar extends Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.user
+    user: state.user,
+    query: state.query
   }
 }
 
