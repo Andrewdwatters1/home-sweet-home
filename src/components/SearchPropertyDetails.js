@@ -33,45 +33,20 @@ class Search extends Component {
       maxPriceIndex: -1,
       maxPrice: '',
 
+      // DATE
+      listedToday: false,
+      listedLast7: false,
+      listedLast30: false,
+      listedAnytime: true,
+
       // REQUIRED FIELDS
+      locationSet: false,
       statusSet: false,
       typeSet: false,
       priceRangeSet: false,
 
-
     }
   }
-
-  // ex multi field query w/ AND: query": "city:Austin AND numBathroom:2"
-  //    note: can also use OR
-  // ex city "query": "city:(Austin OR Houston OR Dallas)"
-  // ex query to ensure all values have price: "query": "prices:*"
-  // ex query to search date range: "query": "dateAdded:[2017-01-01 TO 2017-02-01]"
-  // ex query to search unbounded date range: "query": "dateAdded:[2017-01-01 TO *]"
-
-  zillow = () => {
-    console.log('clicked');
-    const parameters = {
-      address: "5069 Iron Horse Trail",
-      citystatezip: "Colorado Springs, CO",
-      rentzestimate: false
-    }
-    axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
-      const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
-      console.log(address);
-      console.log(links);
-      console.log(localRealEstate);
-      console.log(zestimate);
-      console.log(zpid);
-    }).catch(error => console.log(error));
-    // if (!this.props.user.location) this.props.history.push('/form');
-  }
-
-
-
-
-
-
 
   getCitiesListFromState = () => {
     // const state = this.props.user.state || this.props.user.stateReq;
@@ -99,7 +74,6 @@ class Search extends Component {
       divChildren.find(e => e.nodeName === "SELECT" && e.hidden == true),
       divChildren.find(e => e.nodeName === "BUTTON" && e.hidden == true)
     ]
-
     if (tgts[0] !== undefined) tgts.forEach(e => e.removeAttribute('hidden'))
     else alert('Only 5 cities allowed'); // make better
   }
@@ -110,7 +84,6 @@ class Search extends Component {
       document.getElementById(`cities-button-${id}`)
     ];
     tgts.forEach(e => e.setAttribute('hidden', true));
-
     const citiesList = [...this.state.citiesSelected];
     citiesList.splice(id, 1);
     this.setState({
@@ -126,52 +99,40 @@ class Search extends Component {
       citiesSelected: citiesList
     }, () => this.checkLocationRequirement());
   }
-  // -------------- LOCATION --------------------- // 
 
-
+  checkLocationRequirement = () => {
+    if (this.state.citiesSelected.some(e => e)) this.setState({ locationSet: true });
+    else this.setState({ locationSet: false });
+  }
 
 
   // -------------- STATUS --------------------- // 
   handleStatusChange = (e) => {
     const { name, checked } = e.target;
-    const childInputs = [...document.querySelector('section[name="status"]').children]
-      .filter(e => e.nodeName === 'INPUT');
-
     this.setState({
       [name]: checked
-    }, () => this.checkStatusRequirement(childInputs));
+    }, () => this.checkStatusRequirement());
   }
 
-  checkStatusRequirement = (children) => {
-    children.pop();
-    if (children.some(e => e.value === 'true')) this.setState({ statusSet: true })
+  checkStatusRequirement = () => {
+    if (this.state.forSale || this.state.forRent) this.setState({ statusSet: true })
     else this.setState({ statusSet: false })
   }
-  // -------------- STATUS --------------------- // 
-
-
-
-
 
 
   // -------------- TYPE --------------------- // 
   handlePropertyTypeChange = (e) => {
     const { name, checked } = e.target;
-    const childInputs = [...document.querySelector('section[name="property-type"]').children]
-      .filter(e => e.nodeName === 'INPUT');
     this.setState({
       [name]: checked
-    }, () => this.checkTypeRequirement(childInputs))
+    }, () => this.checkTypeRequirement())
   }
 
-  checkTypeRequirement = (children) => {
-    if (children.some(e => e.value === 'true')) this.setState({ typeSet: true })
+  checkTypeRequirement = () => {
+    const { singleFamily, condoOrTownhome, apartment, newBuild, commercialOrInvestment, vacationOrOther } = this.state;
+    if (singleFamily || condoOrTownhome || apartment || newBuild || commercialOrInvestment || vacationOrOther) this.setState({ typeSet: true })
     else this.setState({ typeSet: false })
   }
-  // -------------- TYPE --------------------- // 
-
-
-
 
 
   // -------------- PRICE --------------------- // 
@@ -179,26 +140,32 @@ class Search extends Component {
     const { name, value } = e.target;
     const index = this.state.pricePossibleValues.findIndex(e => e === value);
     const valueToSet = `${name}Index`;
-    console.log(valueToSet, ':', index);
     this.setState({
       [name]: value,
       [valueToSet]: index
-    }, () => {
-      console.log('min price index', this.state.minPriceIndex);
-      console.log('max price index', this.state.maxPriceIndex);
-    })
+    }, () => this.checkPriceRequirement());
   }
-  // -------------- PRICE --------------------- // 
 
-
-
-
-
-  testDF = () => {
-    axios.post('/api/testDF')
-      .then(result => console.log(result))
-      .catch(error => console.log('front-end error', error));
+  checkPriceRequirement = () => {
+    if (this.state.minPrice || this.state.maxPrice) this.setState({ priceRangeSet: true });
+    else this.setState({ priceRangeSet: false })
   }
+
+
+  // -------------- DATE --------------------- // 
+  handleDateChange = (e) => {
+    const { name, checked } = e.target;
+    this.setState({
+      [name]: checked
+    });
+  }
+
+
+  // testDF = () => {
+  //   axios.post('/api/testDF')
+  //     .then(result => console.log(result))
+  //     .catch(error => console.log('front-end error', error));
+  // }
 
   componentDidMount() {
     // if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
@@ -207,14 +174,12 @@ class Search extends Component {
   }
 
   render() {
-    // console.log('state isssssssssssss', this.state);
+    console.log('state isssssssssssss', this.state);
     return (
       <div>
-        <i>Logo</i>
-        <h1>Home Sweet Home</h1>
+        <h2>Property Details</h2>
 
         <div>
-
           <div name="location">
             <label for="location">Location</label>
             {/* TODO: THIS PROBABLY SHOULDN'T BE AN INPUT */}
@@ -310,7 +275,6 @@ class Search extends Component {
             </div>
 
             <div name="price">
-              {/* PRICES */}
               <label for="price">Price</label>
               <section>
                 <label for="minPrice">Min</label>
@@ -351,14 +315,19 @@ class Search extends Component {
             </div>
 
             <div>
-              {/* DATE ADDED */}
-            </div>
-
-            <div>
-              {/* FEES/HOA/ETC */}
+              <label for="dates">Date Added</label>
+              <section name="dates">
+                <label for="listedToday">Today</label>
+                <input type="checkbox" name="listedToday" onChange={this.handleDateChange} value={this.state.listedToday} />
+                <label for="listedLast7">Last 7 Days</label>
+                <input type="checkbox" name="listedLast7" onChange={this.handleDateChange} value={this.state.listedLast7} />
+                <label for="listedLast30">Last 30 Days</label>
+                <input type="checkbox" name="listedLast30" onChange={this.handleDateChange} value={this.state.listedLast30} />
+                <label for="listedAnytime">Anytime</label>
+                <input type="checkbox" name="listedAnytime" onChange={this.handleDateChange} value={this.state.listedAnytime} defaultChecked />
+              </section>
             </div>
           </div>
-
 
           <button onClick={this.zillow}>ZILLOW BABAYYYYYY</button>
         </div>

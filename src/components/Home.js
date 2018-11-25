@@ -19,18 +19,12 @@ class Home extends Component {
       citystatezip: "Colorado Springs, CO",
       rentzestimate: false
     }
-    axios.post('/api/getSinglePropertySearchResults', parameters)
-      .then(result => {
-        const { address, links, localRealEstate, zestimate, zpid } = result.data[0];
-        console.log(address);
-        console.log(links);
-        console.log(localRealEstate);
-        console.log(zestimate);
-        console.log(zpid);
-      })
-      .catch(error => console.log(error));
+    axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
+      console.log(result.data[0]);
+    }).catch(error => console.log(error));
     // if (!this.props.user.location) this.props.history.push('/form');
   }
+  
   zillow2 = () => {
     const stateParameters = {
       state: this.props.user.state,
@@ -57,7 +51,7 @@ class Home extends Component {
     console.log(this.props.user)
     return (
       <div>
-        <Searchbar/>
+        <Searchbar />
         <button
           onClick={this.testDF}>zillow</button>
       </div>
