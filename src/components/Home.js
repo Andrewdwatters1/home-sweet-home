@@ -41,11 +41,6 @@ class Home extends Component {
       })
       .catch(error => console.log(error));
   }
-  testDF = () => {
-    axios.post('/api/testDF')
-      .then(result => console.log(result))
-      .catch(error => console.log('front-end error', error));
-  }
 
   render() {
     console.log(this.props.user)
@@ -53,7 +48,7 @@ class Home extends Component {
       <div>
         <Searchbar />
         <button
-          onClick={this.testDF}>zillow</button>
+          onClick={() => alert('does nothing')}>zillow</button>
       </div>
     )
   }

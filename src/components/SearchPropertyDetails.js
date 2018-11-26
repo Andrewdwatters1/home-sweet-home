@@ -187,13 +187,6 @@ class SearchPropertyDetails extends Component {
   }
 
 
-
-  // testDF = () => {
-  //   axios.post('/api/testDF')
-  //     .then(result => console.log(result))
-  //     .catch(error => console.log('front-end error', error));
-  // }
-
   componentDidMount() {
     if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
     // this.getCitiesListFromState(); // REMOVE ME

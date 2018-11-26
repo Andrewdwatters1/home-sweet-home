@@ -1,32 +1,71 @@
 module.exports = {
-  num_found: 23267625,
+  num_found: 87219,
   total_cost: 1,
   records:
-    [{
-      address: '1345 N E Highland St',
-      city: 'Portland',
-      country: 'US',
-      dateAdded: '2017-09-12T21:10:54Z',
-      dateUpdated: '2017-09-12T21:10:54Z',
-      features: [Array],
-      keys: [Array],
-      latitude: '45.569338',
-      listingName: '1345 Ne Highland St, Portland, or 97211',
-      longitude: '-122.650843',
-      lotSizeValue: 4000,
-      lotSizeUnit: 'Sq. ft',
-      numBathroom: 2,
-      numBedroom: 3,
-      numFloor: 1,
-      parking: [Array],
-      postalCode: '97211',
-      propertyTaxes: [Array],
-      propertyType: 'Single Family Dwelling',
-      province: 'OR',
-      sourceURLs: [Array],
-      statuses: [Array],
-      id: 'AV-SqWxYyCk2Bpf6Ed18'
-    }]
+    [
+      {
+        address: '5755 S Pagosa Way',
+        city: 'Centennial',
+        country: 'US',
+        dateAdded: '2018-02-19T02:02:13Z',
+        dateUpdated: '2018-02-19T02:02:13Z',
+        descriptions: [
+          {
+            dateSeen: ["2018-02-01T21:58:00.000Z"],
+            sourceURLs: ["https://www.movoto.com/centennial-co/5755-s-pagosa-way-centennial-co-80015-521_3923966/"],
+            value: "Gorgeous multi-level home in Piney Creek Hills. Located in the coveted Cherry Creek School District. Private front courtyard..."
+          }
+        ],
+        floorSizeValue: 3882,
+        floorSizeUnit: 'Sq. ft',
+        imageURLs: [
+          "https://pi.movoto.com/p/522/816090_0_AJFUYn_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_rRqZnR_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_EmyYUz_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_26BbBY_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_unrFZ2_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_3RIuR3_p.jpeg",
+          "https://pi.movoto.com/p/522/816090_0_mrIjQq_p.jpeg"
+        ],
+        keys: ["us/colorado/centennial/5755spagosaway", "mlsnumber/us/colorado/816090"],
+        latitude: '39.612151',
+        listingName: '5755 S Pagosa Way',
+        longitude: '-104.791314',
+        mlsNumber: '816090',
+        nearbySchools: [
+          { assigned: "true", dateSeen: ["2018-02-19T02:02:13Z"], gradeLevels: ["PK-5"], name: "Trails West Elementary School", sourceURLs: ["https://www.movoto.com/centennial-co/5755-s-pagosa-way-centennial-co-80015-521_3923966/"] },
+          { assigned: "true", dateSeen: Array(1), gradeLevels: Array(1), name: "Falcon Creek Middle School", sourceURLs: Array(1) },
+          { assigned: "true", dateSeen: Array(1), gradeLevels: Array(1), name: "Grandview High School", sourceURLs: Array(1) }
+        ],
+        numBathroom: 4,
+        numBedroom: 4,
+        postalCode: '80015',
+        prices: [
+          {
+            amountMax: 479900,
+            amountMin: 479900,
+            currency: "USD",
+            dateSeen: ["2018-02-01T21:58:00.000Z"],
+            isSale: "false",
+            isSold: "false",
+            pricePerSquareFoot: 124,
+            sourceURLs: ["https://www.movoto.com/centennial-co/5755-s-pagosa-way-centennial-co-80015-521_3923966/"]
+          }
+        ],
+        propertyType: 'Single Family Dwelling',
+        province: 'Colorado',
+        sourceURLs: ["https://www.movoto.com/centennial-co/5755-s-pagosa-way-centennial-co-80015-521_3923966/"],
+        statuses: [
+          {
+            dateSeen: ["2018-02-01T21:58:00.000Z"],
+            isUnderContract: "false",
+            sourceURLs: ["https://www.movoto.com/centennial-co/5755-s-pagosa-way-centennial-co-80015-521_3923966/"],
+            type: "Sold"
+          }
+        ],
+        id: 'AWGs4wVRAXxH_fqQthCW'
+      }
+    ]
 }
 
 // --- POSSIBLE VALUES FOR "propertyType": 

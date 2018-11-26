@@ -12,9 +12,28 @@ class Searchbar extends Component {
   }
 
   validateAndSubmitQuery = () => {
-    console.log('QUERY', this.props.query)
-    console.log('USER', this.props.user)
+    const { query } = this.props;
+
+    // const requiredFields =
+    //   query.details.some(e => e[0] === "typeSet")
+    //   && query.details.some(e => e[0] === "statusSet")
+    //   && query.details.some(e => e[0] === "locationSet")
+    //   && query.details.some(e => e[0] === "priceRangeSet");
+    const requiredFields = 1;
+
+    if (requiredFields) {
+      axios.post('/api/getSearchResults', query)
+        .then(result => {
+
+          // if num_records greater than 1 result.data.records will return an array
+          console.log(result.data.records[0])
+        })
+        .catch(error => console.log('Error in query submission'));
+    } else alert('Please complete the required fields (Property-type, Status, Location, Price) ')
+    // if(query.details[priceRangeSet] && query.details[typeSet] &&)
   }
+
+
   render() {
     return (
       <div style={{

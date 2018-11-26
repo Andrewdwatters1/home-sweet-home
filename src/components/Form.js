@@ -107,7 +107,10 @@ class Form extends Component {
   submitForm = (e) => {
     e.preventDefault();
     const { first, last, email, city, state, zip } = this.props.user;
-    if (this.state.submitEnabled && first && last && email && city && state && zip) this.props.history.push('/');
+    if (this.state.submitEnabled && first && last && email && city && state && zip) {
+      this.props.history.push('/');
+      // axios.post('/api/auth')
+    }
   }
 
   skipForm = (e) => {

@@ -1,28 +1,11 @@
 const request = require('request');
 const nodeZillow = require("node-zillow")
 const zillow = new nodeZillow(process.env.ZILLOW_API_KEY, { https: true })
+
 const sampleData = require('../sampleDFData');
+const propertySearch = require('../middleware/propertySearch');
 
 // DF API options
-const API_token = process.env.DATAFINITI_API_KEY;
-const format = "JSON";
-const query = "country:US";
-const num_records = 1;
-const download = false;
-const dfOptions = {
-  url: "https://api.datafiniti.co/v4/properties/search",
-  method: "POST",
-  json: {
-    "query": query,
-    "format": format,
-    "num_records": num_records,
-    "download": download
-  },
-  headers: {
-    'Authorization': 'Bearer ' + API_token,
-    "Content-Type": "application/json"
-  }
-}
 // ex multi field query w/ AND: query": "city:Austin AND numBathroom:2"
 //    note: can also use OR
 // ex city "query": "city:(Austin OR Houston OR Dallas)"
@@ -46,22 +29,46 @@ const dfOptions = {
 // regionid
 
 module.exports = {
-  testDF: (req, res) => {
-    res.send(sampleData);
-    // request(dfOptions, (error, response, body) => {
-    //   if (error) res.send(500).send("Error:" + error, "RES:" + response)
-    //   else res.status(200).send(body);
-    // })
-  },
-
-  getSearchResults: (req, res) => {
-    // city should include only searched cities => ex: "query": "city:Austin OR city:Houston"
+  getSearchResults: async (req, res) => {
+    const { body } = req;
+    console.log(propertySearch.formatQuery(body));
 
     // statuses.type should not include "Not for Sale"
     // if "rent" should include "Short Term Rental", "Rental" and "Rent To Own"
     // if "buy" should include "For Sale" and "Rent To Own"
     // if "available" should not include statuses.isUnderContract = "true"
-    
+
+    // const API_token = process.env.DATAFINITI_API_KEY;
+    // const query = await propertySearch.formatQuery(body);
+    // // const num_records = 1;
+
+    // const dataFinitiOptions = {
+    //   url: "https://api.datafiniti.co/v4/properties/search",
+    //   method: "POST",
+    //   json: {
+    //     "query": query,
+    //     "format": "JSON",
+    //     "num_records": 1,
+    //     "download": false
+    //   },
+    //   headers: {
+    //     'Authorization': 'Bearer ' + API_token,
+    //     "Content-Type": "application/json"
+    //   }
+    // }
+
+    // request(dataFinitiOptions, (error, response, body) => {
+    //   if (error) {
+    //     res.send(500).send("Error: " + error, "RES: " + response)
+    //     console.log("Error: " + error, "RES: " + response);
+    //   } else {
+    //     res.status(200).send(body);
+    //     console.log(body);
+    //   }
+    // })
+  },
+  getTestSearchResults: (req, res) => {
+    res.send(sampleData);
   },
   getSinglePropertySearchResults: (req, res) => {
     zillow.get('GetSearchResults', req.body)
