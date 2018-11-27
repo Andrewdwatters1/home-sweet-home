@@ -32,12 +32,8 @@ module.exports = {
 
   getSearchResults: async (req, res) => {
     const { body } = req;
-
-    // const API_token = process.env.DATAFINITI_API_KEY;
-    const query = await propertySearch.formatQuery(body);
-    // const num_records = 1;
-
-    console.log('FINAL QUERY', query)
+    const query = await propertySearch.formatQuery(body)
+    console.log('FINAL QUERY TO BE SENT', query)
 
     // const dataFinitiOptions = {
     //   url: "https://api.datafiniti.co/v4/properties/search",
@@ -49,7 +45,7 @@ module.exports = {
     //     "download": false
     //   },
     //   headers: {
-    //     'Authorization': 'Bearer ' + API_token,
+    //     'Authorization': 'Bearer ' + process.env.DATAFINITI_API_KEY,
     //     "Content-Type": "application/json"
     //   }
     // }
@@ -63,10 +59,7 @@ module.exports = {
     //     console.log(body);
     //   }
     // })
-  },
-
-  getTestSearchResults: (req, res) => {
-    res.send(sampleData);
+    res.status(200).send(sampleData);
   },
 
   getSinglePropertySearchResults: (req, res) => {

@@ -14,12 +14,12 @@ class Searchbar extends Component {
   validateAndSubmitQuery = () => {
     const { query } = this.props;
 
-    // const requiredFields =
-    //   query.details.some(e => e[0] === "typeSet")
-    //   && query.details.some(e => e[0] === "statusSet")
-    //   && query.details.some(e => e[0] === "locationSet")
-    //   && query.details.some(e => e[0] === "priceRangeSet");
-    const requiredFields = 1;
+    const requiredFields =
+      query.details.some(e => e[0] === "typeSet")
+      && query.details.some(e => e[0] === "statusSet")
+      && query.details.some(e => e[0] === "locationSet")
+      && query.details.some(e => e[0] === "priceRangeSet");
+    // const requiredFields = 1;
 
     if (requiredFields) {
       axios.post('/api/getSearchResults', query)

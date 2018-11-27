@@ -25,18 +25,18 @@ class SearchPropertyAmmenities extends Component {
       sqftMaxIndex: 0,
       sqftMin: "",
 
-      // LOT SIZE
-      lotSizePossValues: ['2,000 sq ft', '4,000 sq ft', '6,000 sq ft', '8,000 sq ft', '.25 acres', '.5 acres', '.75 acres', '1 acre', '1.5 acres', '2 acres', '3 acres', '4 acres', '5 acres', '10 acres', '20 acres', '50 acres+'],
-      lotSizeMinIndex: 0,
-      lotSizeMin: "",
-      lotSizeMaxIndex: 0,
-      lotSizeMin: "",
+      // // LOT SIZE
+      // lotSizePossValues: ['2,000 sq ft', '4,000 sq ft', '6,000 sq ft', '8,000 sq ft', '.25 acres', '.5 acres', '.75 acres', '1 acre', '1.5 acres', '2 acres', '3 acres', '4 acres', '5 acres', '10 acres', '20 acres', '50 acres+'],
+      // lotSizeMinIndex: 0,
+      // lotSizeMin: "",
+      // lotSizeMaxIndex: 0,
+      // lotSizeMin: "",
 
       // PARKING
-      parkingSpaces: 0,
+      parking: false,
 
       // PETS
-      pets: false,
+      // pets: false,
 
       // FEES
       fees: '',
@@ -137,7 +137,7 @@ class SearchPropertyAmmenities extends Component {
         </div>
 
 
-        <div name="lot-size">
+        {/* <div name="lot-size">
           <label for="lot-size">Lot Size</label>
 
           <label for="lotSizeMin">Min</label>
@@ -154,26 +154,27 @@ class SearchPropertyAmmenities extends Component {
               .filter((e, i) => this.state.lotSizeMinIndex > -1 ? i > this.state.lotSizeMinIndex : e)
               .map((elem, index) => <option key={index} value={elem}>{elem}</option>)}
           </select>
-        </div>
+        </div> */}
 
 
         <div name="parking">
-          <label for="parking">Parking Spaces</label>
-          <select name="parkingSpaces" onChange={this.handleChange} value={this.state.parkingSpaces}>
+          <label for="parking">Parking Required</label>
+          <input name="parking" type="checkbox" onChange={this.handleChange} checked={this.state.parking}/>
+          {/* <select name="parkingSpaces" onChange={this.handleChange} value={this.state.parkingSpaces}>
             <option value="" defaultValue>No min</option>
             <option value="1">1+</option>
             <option value="2">2+</option>
             <option value="3">3+</option>
             <option value="4">4+</option>
             <option value="5">5+</option>
-          </select>
+          </select> */}
         </div>
 
 
-        <div>
+        {/* <div>
           <label for="pets">Pets Allowed</label>
           <input name="pets" type="checkbox" checked={this.state.pets} onChange={this.handleChange} />
-        </div>
+        </div> */}
 
 
         <div>

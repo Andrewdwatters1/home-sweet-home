@@ -30,8 +30,10 @@ module.exports = self = {
     // console.log(destructureProperties);
 
     console.log(queryObj);
+
     // COUNTRY
     queryParams.push("country:US");
+
 
     // CITY
     if (details.citiesSelected) {
@@ -41,26 +43,20 @@ module.exports = self = {
         `city:${details.citiesSelected}`);
     } else returnError = true;
 
+
     // STATUS
-    if (details.isAvailable) {
-      let status = ''
-      if (details.forRent && details.forSale) {
-        status = `statuses.type:(For Sale OR Short Term Rental OR Rental OR Rent To Own`;
-      } else if (details.forRent) {
-        status = `statuses.type:(Short Term Rental OR Rental OR Rent To Own`;
-      } else if (details.forSale) {
-        status = `statuses.type:(For Sale OR Rent To Own`;
-      } else returnError = true;
-      status += ' AND -isUnderContract)';
+    let status = ''
+    if (details.forRent && details.forSale) {
+      status = `statuses.type:(\"For Sale\" OR \"Short Term Rental\" OR Rental OR \"Rent To Own\")`;
+    } else if (details.forRent) {
+      status = `statuses.type:(\"Short Term Rental\" OR Rental OR \"Rent To Own\")`;
+    } else if (details.forSale) {
+      status = `statuses.type:(\"For Sale\" OR \"Rent To Own\")`;
     } else {
-      if (details.forRent && details.forSale) {
-        status = `statuses.type:(For Sale OR Short Term Rental OR Rental OR Rent To Own)`;
-      } else if (details.forRent) {
-        status = `statuses.type:(Short Term Rental OR Rental OR Rent To Own)`;
-      } else if (details.forSale) {
-        status = `statuses.type:(For Sale OR Rent To Own)`;
-      } else returnError = true;
+      returnError = true;
     }
+    queryParams.push(status);
+
 
     // DATE ADDED
     if (details.dateListed === "today") {
@@ -74,6 +70,7 @@ module.exports = self = {
       queryParams.push(`dateAdded:[${now.subtract(30, 'days').format("YYYY-MM-DD")} TO *]`)
     }
 
+
     // TYPE
     const allTypes = [];
     if (details.singleFamily) propertyTypes.singleFamVals.forEach(e => allTypes.push(e));
@@ -85,6 +82,7 @@ module.exports = self = {
     if (details.vacationOrOther) propertyTypes.otherVals.forEach(e => allTypes.push(e));
 
     queryParams.push(`propertyType:(${allTypes.join(' OR ')})`);
+
 
     // PRICE
     const minPrice = details.minPrice ? makeNumber(details.minPrice) : null;
@@ -102,28 +100,115 @@ module.exports = self = {
       }
 
     }
-    // queryParams.push(`prices:[${minPrice} TO ${maxPrice}]`)
-    queryParams.push("prices:*")
+    if (maxPrice && minPrice) {
+      queryParams.push(`prices.amountMax:>${minPrice} AND prices.amountMax:<${maxPrice}`)
+    } else if (maxPrice && !minPrice) {
+      queryParams.push(`prices.amountMax:<${maxPrice}`)
+    } else if (minPrice && !maxPrice) {
+      queryParams.push(`prices.amountMax:>${minPrice}`)
+    } else {
+      queryParams.push("prices:*")
+    }
+    if (details.isAvailable) queryParams.push('statuses.isUnderContract:false');
 
-    return queryParams.join(' AND ');
+
+    // BEDROOMS
+    const formatBedsVal = str => str[str.length - 1] === "+" ? str.slice(0, str.length - 1) : str;
+
+    if (ammenities.bedsMin) {
+      if (ammenities.bedsMin !== "Studio") {
+        queryParams.push(`numBedroom:>=${formatBedsVal(ammenities.bedsMin)}`);
+      }
+    }
+    if (ammenities.bedsMax) {
+      if (ammenities.bedsMin !== "Studio") {
+        queryParams.push(`numBedroom:<=${formatBedsVal(ammenities.bedsMax)}`);
+      }
+    }
+
+
+    // BATHROOMS
+    if (ammenities.baths) {
+      queryParams.push(`numBathroom:>=${ammenities.baths}`);
+    }
+
+
+    // SQUARE FEET
+    if (ammenities.sqftMin) {
+      queryParams.push(`floorSizeValue:>=${formatSqftVal(ammenities.sqftMin)}`);
+      queryParams.push('floorSizeUnit:\"Sq. ft\"');
+    }
+    if (ammenities.sqftMax) {
+      queryParams.push(`floorSizeValue:<=${formatSqftVal(ammenities.sqftMax)}`);
+      queryParams.push('floorSizeUnit:\"Sq. ft\"');
+    }
+
+    function formatSqftVal(str) {
+      if (str[str.length - 1] === "+") str = str.slice(0, str.length - 1);
+      if (Number.isNaN(+str)) {
+        let strArr = str.split('');
+        strArr.splice(1, 1);
+        return +strArr.join('');
+      }
+      else return +str
+    }
+
+
+    // PARKING 
+    if (ammenities.parking) {
+      queryParams.push("parking:*");
+    }
+
+
+    // FEES 
+    if (ammenities.fees) {
+      queryParams.push(`fees.amountMax:>${(+ammenities.fees) - .1}`);
+    }
+
+
+
+
+
+
+
+    // KEYWORDS 
+    // features.key
+    // brokers.agent
+    // brokers.company 
+    // listingName
+    // nearbySchools.name
+    // neighborhoods
+    // reviews.text
+    // descriptions.value
+
+
+    // FINAL ERROR CHECK AND RETURN
+    if (returnError) return "Error, query not contructed properly"
+    else return queryParams.join(' AND ');
   }
 }
 
 
+// ------ GOOD QUERY ---------- // 
+// country:US AND 
+// city:Denver AND 
+// statuses.type:("For Sale" OR "Rent To Own") AND 
+// dateAdded:[2018-10-28 TO *] AND 
+// propertyType:(House OR Home OR "Single Family Dwelling" OR Residential) AND 
+// prices.amountMax:>125000 AND 
+// prices.amountMax:<425000 AND 
+// statuses.isUnderContract:false AND 
+// numBathroom:>=1.25 AND 
+// floorSizeValue:>=1000 AND 
+// floorSizeUnit:"Sq. ft" AND 
+// floorSizeValue:<=5000 AND 
+// floorSizeUnit:"Sq. ft" AND 
+// parking:* AND 
+// fees.amountMax:>-1
 
-// country:US AND city:(Aurora OR Centennial OR Englewood) AND statuses.type:(undefined) AND dateAdded:[2018-11-19 TO *] AND propertyType:(House OR Home OR Single Family Dwelling OR Residential OR Condo OR Townhouse) AND prices:[250000 TO 400000]
 
-// const testQuery = {
-//   details: [
-//     ["minPrice", "50,000"],
-//     ["maxPrice", "175,000"],
-//   ],
+
 //   ammenities: [
-//     ["bedsMin", "2"],
-//     ["baths", "1.25"],
-//     ["sqftMin", "800"],
-//     ["lotSizeMin", "4,000 sq ft"],
-//     ["parkingSpaces", "1"],
 //     ["pets", true],
 //     ["fees", "100"],
 //     ["bedsMax", "4"],
@@ -131,7 +216,6 @@ module.exports = self = {
 //     ["lotSizeMax", ".5 acres"]
 //   ]
 // }
-
 // details = {
 //   citiesSelected: ['Amherst'],
 //   forSale: true,
@@ -146,7 +230,9 @@ module.exports = self = {
 //   typeSet: true,
 //   priceRangeSet: true
 // }
-// ammenities = { pets: true }
+
+
+
 // propertyTypes = {
 //   singleFamVals: ['House', 'Home', 'Single Family Dwelling', 'Residential'],
 //   condoVals: ['Condo', 'Townhouse'],
