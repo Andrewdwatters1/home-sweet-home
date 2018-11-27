@@ -19,7 +19,6 @@ class Searchbar extends Component {
       && query.details.some(e => e[0] === "statusSet")
       && query.details.some(e => e[0] === "locationSet")
       && query.details.some(e => e[0] === "priceRangeSet");
-    // const requiredFields = 1;
 
     if (requiredFields) {
       axios.post('/api/getSearchResults', query)
@@ -33,6 +32,16 @@ class Searchbar extends Component {
     // if(query.details[priceRangeSet] && query.details[typeSet] &&)
   }
 
+  getTestData = () => {
+    axios.post('/api/getSearchResults', this.props.query)
+      .then(result => {
+        const { records } = result.data[0];
+        console.log(records)
+        // THEN SAVE THE RESULT TO REDUX AND MAKE GLOBAL
+        // this.props.saveSearchResults(records) 
+      })
+  }
+
 
   render() {
     return (
@@ -44,7 +53,8 @@ class Searchbar extends Component {
         <SearchPropertyDetails />
         <SearchPropertyAmmenities />
         {/* <SearchByAddressOrMLS /> */}
-        <button onClick={this.validateAndSubmitQuery}>SEARCH</button>
+        {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
+        <button onClick={this.getTestData}>SEARCH</button>
       </div>
     )
   }
