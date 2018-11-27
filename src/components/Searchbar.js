@@ -24,11 +24,11 @@ class Searchbar extends Component {
     if (requiredFields) {
       axios.post('/api/getSearchResults', query)
         .then(result => {
-
+          console.log(result);
           // if num_records greater than 1 result.data.records will return an array
           console.log(result.data.records[0])
         })
-        .catch(error => console.log('Error in query submission'));
+        .catch(error => console.log('Error in query submission', error));
     } else alert('Please complete the required fields (Property-type, Status, Location, Price) ')
     // if(query.details[priceRangeSet] && query.details[typeSet] &&)
   }

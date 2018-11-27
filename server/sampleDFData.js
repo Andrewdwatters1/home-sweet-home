@@ -68,67 +68,6 @@ module.exports = {
     ]
 }
 
-// --- POSSIBLE VALUES FOR "propertyType": 
-// Single Family Home: 
-//   Home, 
-//   House,
-//   Single Family Dwelling
-//   Residential 
-// Condo/Townhome
-//   Condo
-//   Townhouse 
-// Apartment/Complex
-//   Apartment
-//   Apartments
-//   Dorm
-//   Hostel*
-//   Motels
-//   Rental Unit
-//   Room
-//   Unit 
-// New Build/Manufactured
-//   Manufactured Home
-//   Mobile Home
-// Commercial/Rental
-//   Apartment Building
-//   Bed Breakfast
-//   Boat
-//   Boat Slip
-//   Building
-//   Commercial*
-//   Condo Building
-//   Duplex
-//   Industrial
-//   Inns 
-//   Multi-Family Dwelling
-//   Quadruplex
-//   Rental Unit Building
-//   Triplex 
-// Land
-//   Land
-//   Farm
-//   Island
-// Other
-//   Bungalow
-//   Cabin
-//   Camper/RV
-//   Campgrounds
-//   Castle
-//   Cave
-//   Cottages
-//   Development Site
-//   Hut
-//   Igloo
-//   Lodges 
-//   Nature Lodge
-//   Resorts 
-//   Tent 
-//   Tipi 
-//   Vacation Rental 
-//   Villa* 
-
-
-
 // -- POSSIBLE VALUES FOR "statuses.type":
 // Short Term Rental
 // Rental

@@ -18,7 +18,7 @@ class SearchPropertyDetails extends Component {
       // STATUS
       forSale: false,
       forRent: false,
-      isAvailable: false,
+      isAvailable: true,
 
       // PROPERTY TYPE
       singleFamily: false,
@@ -36,7 +36,7 @@ class SearchPropertyDetails extends Component {
       maxPrice: '',
 
       // DATE
-      dateListed: "Anytime",
+      dateListed: "anytime",
 
       // REQUIRED FIELDS
       locationSet: false,
@@ -48,18 +48,18 @@ class SearchPropertyDetails extends Component {
   }
 
   getCitiesListFromState = () => {
-    const state = this.props.user.state || this.props.user.stateReq;
-    axios.post('/api/getRegionChildren', {
-      state: state,
-      childtype: "city"
-    }).then(result => {
-      this.setState({
-        citiesDerivedFromState: [...result.data.response.list.region]
-          .map(e => e = e.name[0])
-          .sort()
-      })
-    }).catch(error => console.log(error));
-    // this.setState({ citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins'] })
+    // const state = this.props.user.state || this.props.user.stateReq;
+    // axios.post('/api/getRegionChildren', {
+    //   state: state,
+    //   childtype: "city"
+    // }).then(result => {
+    //   this.setState({
+    //     citiesDerivedFromState: [...result.data.response.list.region]
+    //       .map(e => e = e.name[0])
+    //       .sort()
+    //   })
+    // }).catch(error => console.log(error));
+    this.setState({ citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins'] })
   }
 
 
@@ -188,8 +188,8 @@ class SearchPropertyDetails extends Component {
 
 
   componentDidMount() {
-    if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
-    // this.getCitiesListFromState(); // REMOVE ME
+    // if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
+    this.getCitiesListFromState(); // REMOVE ME
     // TODO: else redirect back to form or otherwise get a state for the user
   }
 

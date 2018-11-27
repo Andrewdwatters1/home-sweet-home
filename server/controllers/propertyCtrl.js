@@ -29,18 +29,15 @@ const propertySearch = require('../middleware/propertySearch');
 // regionid
 
 module.exports = {
+
   getSearchResults: async (req, res) => {
     const { body } = req;
-    console.log(propertySearch.formatQuery(body));
-
-    // statuses.type should not include "Not for Sale"
-    // if "rent" should include "Short Term Rental", "Rental" and "Rent To Own"
-    // if "buy" should include "For Sale" and "Rent To Own"
-    // if "available" should not include statuses.isUnderContract = "true"
 
     // const API_token = process.env.DATAFINITI_API_KEY;
-    // const query = await propertySearch.formatQuery(body);
-    // // const num_records = 1;
+    const query = await propertySearch.formatQuery(body);
+    // const num_records = 1;
+
+    console.log('FINAL QUERY', query)
 
     // const dataFinitiOptions = {
     //   url: "https://api.datafiniti.co/v4/properties/search",
@@ -67,9 +64,11 @@ module.exports = {
     //   }
     // })
   },
+
   getTestSearchResults: (req, res) => {
     res.send(sampleData);
   },
+
   getSinglePropertySearchResults: (req, res) => {
     zillow.get('GetSearchResults', req.body)
       .then(result => {
@@ -78,6 +77,7 @@ module.exports = {
       })
       .catch(error => console.log(error))
   },
+
   getRegionChildren: (req, res) => {
     console.log(zillow)
     zillow.get('GetRegionChildren', req.body)
