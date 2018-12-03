@@ -35,7 +35,9 @@ class Searchbar extends Component {
   getTestData = () => {
     axios.post('/api/getSearchResults', this.props.query)
       .then(result => {
+        // console.log(result)
         const { records } = result.data[0];
+        // console.log(records);
         if (records) this.props.saveSearchResults(records)
       })
   }

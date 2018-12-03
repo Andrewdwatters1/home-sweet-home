@@ -48,7 +48,7 @@ class SearchPropertyDetails extends Component {
   }
 
   getCitiesListFromState = () => {
-    // const state = this.props.user.state || this.props.user.stateReq;
+    // const state = this.props.user.state;
     // axios.post('/api/getRegionChildren', {
     //   state: state,
     //   childtype: "city"
@@ -188,7 +188,7 @@ class SearchPropertyDetails extends Component {
 
 
   componentDidMount() {
-    // if (this.props.user.state || this.props.user.stateReq) this.getCitiesListFromState();
+    // if (this.props.user.state) this.getCitiesListFromState();
     this.getCitiesListFromState(); // REMOVE ME
     // TODO: else redirect back to form or otherwise get a state for the user
   }
@@ -205,7 +205,7 @@ class SearchPropertyDetails extends Component {
             <input
               name="state"
               placeholder="CA"
-              value={this.props.user.state ? this.props.user.state.toUpperCase() : this.props.user.stateReq ? this.props.user.stateReq.toUpperCase() : null}
+              value={this.props.user.state ? this.props.user.state : null}
               disabled />
 
             <select

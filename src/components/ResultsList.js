@@ -1,18 +1,86 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
-export default function ResultsList(props) {
-  return (
-    <div className="results-list-outer">
-      <ul>
-        <li onClick={(tgt) => props.updateSelectedResult(0)}>Results[0]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(1)}>Results[1]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(2)}>Results[2]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(3)}>Results[3]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(4)}>Results[4]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(5)}>Results[5]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(6)}>Results[6]</li>
-        <li onClick={(tgt) => props.updateSelectedResult(7)}>Results[7]</li>
-      </ul>
-    </div >
-  )
+import { updateSelectedResult } from '../redux/reducers/query';
+import { usStates } from '../assets/globalData.json';
+
+class ResultsList extends Component {
+  constructor() {
+    super()
+    this.state = {
+      enableHideSidebar: false,
+    }
+  }
+  enableHideSidebar = (e) => {
+    if (![...e.target.classList].some(e => e === 'ignore')) {
+      this.setState({
+        enableHideSidebar: true
+      }, () => {
+        this.hideSidebar()
+        document.removeEventListener('click', this.enableHideSidebar);
+      });
+    }
+  }
+  showSidebar = () => {
+    document.documentElement.style.setProperty('--resultsListWidth', '200px');
+  }
+  hideSidebar = () => {
+    if (this.state.enableHideSidebar) {
+      document.documentElement.style.setProperty('--resultsListWidth', '20px');
+    }
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.enableHideSidebar);
+  }
+  render() { // MUST ADD CLASSNAME="ignore" to all elements
+    const { searchResults } = this.props.query;
+    const { state } = this.props.user;
+
+    console.log(searchResults[0]);
+
+    return (
+      <div
+        className="results-list-outer ignore"
+        onMouseEnter={this.showSidebar}
+        onBlur={this.enableHideSidebar}
+        onMouseLeave={this.hideSidebar}>
+
+        <ul>
+          {this.props.query.searchResults
+            .map((e, i) => {
+              return (
+                <li
+                  onClick={() => this.props.updateSelectedResult(i)}>
+                  <p>{`${searchResults[i].address} \n\r${searchResults[i].city}, ${usStates[searchResults[i].province] || state}`}</p>
+                  <p>{`${searchResults[i].numBedroom} beds, ${searchResults[i].numBathroom} baths, ${searchResults[i].floorSizeValue} ${searchResults[i].floorSizeUnit}`}</p>
+                  {searchResults[i].statuses[0].type ?
+                    <p>{`${searchResults[i].statuses[0].type}: $${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}`}</p>
+                    :
+                    <p>${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}</p>
+                  }
+                </li>
+              )
+            })}
+        </ul>
+
+      </div >
+    )
+  }
 }
+
+const mapStateToProps = state => {
+  return {
+    user: state.user,
+    query: state.query
+  }
+}
+export default connect(mapStateToProps, { updateSelectedResult })(ResultsList);
+
+
+// 20474 E Hampden Pl
+// Aurora, CO 80013
+// 3 beds 3 baths 1,591 sqft
+
+// $359,900
+// [status]

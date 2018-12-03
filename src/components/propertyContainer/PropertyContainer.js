@@ -73,11 +73,11 @@ export default class PropertyContainer extends Component {
           <button onClick={(tgt) => this.updateComponent('neighborhood')}></button>
         </span>
 
-        {this.state.overview && <Overview updateSelectedResult={this.props.updateSelectedResult} />}
-        {this.state.photos && <Photos updateSelectedResult={this.props.updateSelectedResult} />}
-        {this.state.pricing && <Pricing updateSelectedResult={this.props.updateSelectedResult} />}
-        {this.state.location && <Location updateSelectedResult={this.props.updateSelectedResult} />}
-        {this.state.neighborhood && <Neighborhood updateSelectedResult={this.props.updateSelectedResult} />}
+        {this.state.overview && <Overview />}
+        {this.state.photos && <Photos />}
+        {this.state.pricing && <Pricing />}
+        {this.state.location && <Location />}
+        {this.state.neighborhood && <Neighborhood />}
 
       </div>
     )

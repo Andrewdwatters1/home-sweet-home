@@ -1,6 +1,9 @@
 
 :root {
   --searchbarHeight: 175px;
+  --resultsListWidth: 200px;
+  --resultsListTransition: width .4s;
+  --resultsListTransitionTiming: cubic-bezier(.84,1.61,.43,.84); 
 }
 
 
@@ -46,8 +49,9 @@
 
 .home-main {
   height: calc(100vh - var(--searchbarHeight));
-  display: grid;
-  grid-template: 1fr / 3fr 1fr;
+  display: flex;
+  /* display: grid; */
+  /* grid-template: 1fr / 3fr 1fr; */
 }
 
 
@@ -57,7 +61,10 @@
 
 
 .property-container-outer {
+  width: calc(100vw - var(--resultsListWidth));
   background-color: lightgoldenrodyellow;
+  transition: var(--resultsListTransition);
+  transition-timing-function: var(--resultsListTransitionTiming);
 }
 
 
@@ -68,5 +75,15 @@
 
 
 .results-list-outer {
+  width: var(--resultsListWidth);
   background-color: lightsalmon;
+  position: absolute;
+  top: var(--searchbarHeight);
+  bottom: 0;
+  right: 0;
+  overflow-y: hidden;
+  overflow-y: scroll;
+  z-index: 1;
+  transition: var(--resultsListTransition);
+  transition-timing-function: var(--resultsListTransitionTiming);
 }

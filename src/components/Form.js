@@ -76,17 +76,21 @@ class Form extends Component {
   validateState = (e) => {
     e.preventDefault();
     const { name, value } = e.target;
-    if (name === 'state') this.setState({ state: value });
-    else if (name === 'stateReq') this.setState({ stateReq: value });
+    if (name === 'state') this.setState({ state: value.toUpperCase() });
+    else if (name === 'stateReq') this.setState({ stateReq: value.toUpperCase() });
 
-    const stateRegExp = /^A[LKSZRAEP]$|^C[AOT]$|^D[EC]$|^F[LM]$|^G[AU]$|^HI$|^I[ADLN]$|^K[SY]$|^LA$|^M[ADEHINOPST]$|^N[CDEHJMVY]$|^O[HKR]$|^P[ARW]$|^RI$|^S[CD]$|^T[NX]$|^UT$|^V[AIT]$|^W[AIVY]$/i;
-    if (stateRegExp.test(value)) this.inputIsValid(e);
+    const stateRegExp = /^A[LKSZRAEP]$|^C[AOT]$|^D[EC]$|^F[LM]$|^G[AU]$|^HI$|^I[ADLN]$|^K[SY]$|^LA$|^M[ADEHINOPST]$|^N[CDEHJMVY]$|^O[HKR]$|^P[ARW]$|^RI$|^S[CD]$|^T[NX]$|^UT$|^V[AIT]$|^W[AIVY]$/;
+    if (stateRegExp.test(value.toUpperCase())) this.inputIsValid(e);
     else this.inputIsInvalid(name);
   }
 
   inputIsValid = (e) => {
-    const { name } = e.target;
-    this.props.updateUser(e);
+    const { name, value } = e.target;
+
+    name === 'state' || name === 'stateReq' ?
+      this.props.updateUser({ target: { name: 'state', value: value.toUpperCase() } })
+      :
+      this.props.updateUser(e);
 
     const tgtInput = document.querySelectorAll(`input[name="${name}"]`)[0]
     tgtInput.classList.add('form-valid')
@@ -209,7 +213,7 @@ class Form extends Component {
                   name="state"
                   onChange={this.validateState}
                   placeholder="CA"
-                  value={this.state.state} />
+                  value={this.state.state.toUpperCase()} />
               </div>
             </div>
 
@@ -231,7 +235,7 @@ class Form extends Component {
                   name="stateReq"
                   onChange={this.validateState}
                   placeholder="CA"
-                  value={this.state.stateReq}
+                  value={this.state.stateReq.toUpperCase()}
                   autoFocus />
                 <Link to="/" disabled={!this.state.submitEnabled}><button>Search</button></Link>
               </div>
