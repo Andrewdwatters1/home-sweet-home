@@ -32,9 +32,11 @@ module.exports = {
 
   getSearchResults: async (req, res) => {
     const { body } = req;
-    const query = await propertySearch.formatQuery(body)
-    console.log('FINAL QUERY TO BE SENT', query)
-
+    res.status(200).send(sampleData);
+    
+    // const query = await propertySearch.formatQuery(body)
+    // console.log('FINAL QUERY TO BE SENT', query)
+    //
     // const dataFinitiOptions = {
     //   url: "https://api.datafiniti.co/v4/properties/search",
     //   method: "POST",
@@ -49,7 +51,7 @@ module.exports = {
     //     "Content-Type": "application/json"
     //   }
     // }
-
+    //
     // request(dataFinitiOptions, (error, response, body) => {
     //   if (error) {
     //     res.send(500).send("Error: " + error, "RES: " + response)
@@ -59,7 +61,6 @@ module.exports = {
     //     console.log(body);
     //   }
     // })
-    res.status(200).send(sampleData);
   },
 
   getSinglePropertySearchResults: (req, res) => {

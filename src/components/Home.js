@@ -1,54 +1,32 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import axios from 'axios';
 
 import Searchbar from './Searchbar';
+import ResultsList from './ResultsList';
+import PropertyContainer from './propertyContainer/PropertyContainer';
+import { updateSelectedResult } from '../redux/reducers/query';
 
 class Home extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      needs: 'has'
-    }
-  }
 
-  zillow = () => {
-    console.log('clicked');
-    const parameters = {
-      address: "5069 Iron Horse Trail",
-      citystatezip: "Colorado Springs, CO",
-      rentzestimate: false
-    }
-    axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
-      console.log(result.data[0]);
-    }).catch(error => console.log(error));
-    // if (!this.props.user.location) this.props.history.push('/form');
-  }
-  
-  zillow2 = () => {
-    const stateParameters = {
-      state: this.props.user.state,
-      childtype: "city"
-    }
-    const cityParameters = {
-      state: this.props.user.state,
-      city: this.props.user.city,
-      childtype: "zipcode"
-    }
-    axios.post('/api/getRegionChildren', stateParameters)
-      .then(result => {
-        console.log(result);
-      })
-      .catch(error => console.log(error));
+  updateSelectedResult = (tgt) => {
+    this.props.updateSelectedResult(tgt)
   }
 
   render() {
-    console.log(this.props.user)
+    console.log(this.props.query.selectedSearchResult);
     return (
       <div>
-        <Searchbar />
-        <button
-          onClick={() => alert('does nothing')}>zillow</button>
+        {!this.props.query.searchResults ?
+          <Searchbar />
+          :
+          <div>
+            <Searchbar />
+            <div className="home-main">
+              <PropertyContainer updateSelectedResult={this.updateSelectedResult} />
+              <ResultsList updateSelectedResult={this.updateSelectedResult} />
+            </div>
+          </div>
+        }
       </div>
     )
   }
@@ -56,7 +34,8 @@ class Home extends Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.user
+    user: state.user,
+    query: state.query
   }
 }
-export default connect(mapStateToProps)(Home);
+export default connect(mapStateToProps, { updateSelectedResult })(Home);

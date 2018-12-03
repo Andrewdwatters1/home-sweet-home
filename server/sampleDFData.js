@@ -532,6 +532,38 @@ module.exports = [
 
 
 
+ // zillow = () => {
+  //   console.log('clicked');
+  //   const parameters = {
+  //     address: "5069 Iron Horse Trail",
+  //     citystatezip: "Colorado Springs, CO",
+  //     rentzestimate: false
+  //   }
+  //   axios.post('/api/getSinglePropertySearchResults', parameters).then(result => {
+  //     console.log(result.data[0]);
+  //   }).catch(error => console.log(error));
+  //   // if (!this.props.user.location) this.props.history.push('/welcome');
+  // }
+  
+  // zillow2 = () => {
+  //   const stateParameters = {
+  //     state: this.props.user.state,
+  //     childtype: "city"
+  //   }
+  //   const cityParameters = {
+  //     state: this.props.user.state,
+  //     city: this.props.user.city,
+  //     childtype: "zipcode"
+  //   }
+  //   axios.post('/api/getRegionChildren', stateParameters)
+  //     .then(result => {
+  //       console.log(result);
+  //     })
+  //     .catch(error => console.log(error));
+  // }
+
+
+
 
 // -- POSSIBLE VALUES FOR "statuses.type":
 // Short Term Rental

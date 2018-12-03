@@ -12,7 +12,7 @@ class App extends Component {
     return (
       <Switch>
         <Route exact path="/" component={Home} />
-        <Route path="/form" component={Form} />
+        <Route path="/welcome" component={Form} />
       </Switch>
     );
   }

@@ -5,6 +5,7 @@ import axios from 'axios';
 import SearchPropertyDetails from './SearchPropertyDetails';
 import SearchPropertyAmmenities from './SearchPropertyAmmenities';
 import SearchByAddressOrMLS from './SearchByAddressOrMLS';
+import { saveSearchResults } from '../redux/reducers/query';
 
 class Searchbar extends Component {
   constructor() {
@@ -29,32 +30,48 @@ class Searchbar extends Component {
         })
         .catch(error => console.log('Error in query submission', error));
     } else alert('Please complete the required fields (Property-type, Status, Location, Price) ')
-    // if(query.details[priceRangeSet] && query.details[typeSet] &&)
   }
 
   getTestData = () => {
     axios.post('/api/getSearchResults', this.props.query)
       .then(result => {
         const { records } = result.data[0];
-        console.log(records)
-        // THEN SAVE THE RESULT TO REDUX AND MAKE GLOBAL
-        // this.props.saveSearchResults(records) 
+        if (records) this.props.saveSearchResults(records)
       })
   }
 
 
   render() {
     return (
-      <div style={{
-        display: "flex",
-        height: "160px",
-        backgroundColor: "aqua"
-      }}>
-        <SearchPropertyDetails />
-        <SearchPropertyAmmenities />
-        {/* <SearchByAddressOrMLS /> */}
-        {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
-        <button onClick={this.getTestData}>SEARCH</button>
+      <div>
+        {
+          !this.props.query.searchResults ?
+            <div className="initial-search-searchbar">
+
+              <div className="initial-search-searchbar-content">
+                <SearchPropertyDetails />
+                <SearchPropertyAmmenities />
+                {/* <SearchByAddressOrMLS /> */}
+              </div>
+
+
+              <div>
+                {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
+                <button onClick={this.getTestData}>SEARCH</button>
+              </div>
+
+            </div>
+
+            :
+
+            <div className="post-search-searchbar">
+              <SearchPropertyDetails />
+              <SearchPropertyAmmenities />
+              {/* <SearchByAddressOrMLS /> */}
+              {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
+              <button onClick={this.getTestData}>SEARCH</button>
+            </div>
+        }
       </div>
     )
   }
@@ -63,8 +80,8 @@ class Searchbar extends Component {
 const mapStateToProps = state => {
   return {
     user: state.user,
-    query: state.query
+    query: state.query,
   }
 }
 
-export default connect(mapStateToProps)(Searchbar);
+export default connect(mapStateToProps, { saveSearchResults })(Searchbar);
