@@ -9,7 +9,7 @@
 
 
 
-
+/* ------------ FORM ----------- */
 .form-valid {
   box-shadow: 0px 3px 1px rgb(1, 155, 1);
 }
@@ -23,6 +23,12 @@
 
 
 
+
+
+
+
+
+/* -------------- SEARCHBAR ------------------ */
 .initial-search-searchbar {
   display: flex;
   flex-direction: column;
@@ -35,11 +41,6 @@
   display: flex;
 }
 
-
-
-
-
-
 .post-search-searchbar {
   display: flex;
   height: var(--searchbarHeight);
@@ -47,18 +48,18 @@
   background-color: lightskyblue;
 }
 
+
+
+
+
+
+
+
+/* --------------- PROPERTY DETAIL CONTAINER ------------------ */ 
 .home-main {
   height: calc(100vh - var(--searchbarHeight));
   display: flex;
-  /* display: grid; */
-  /* grid-template: 1fr / 3fr 1fr; */
 }
-
-
-
-
-
-
 
 .property-container-outer {
   width: calc(100vw - var(--resultsListWidth));
@@ -74,9 +75,14 @@
 
 
 
+
+
+
+
+/* --------------- PROPERTY RESULTS LIST ------------------ */ 
 .results-list-outer {
   width: var(--resultsListWidth);
-  background-color: lightsalmon;
+  background-color: bisque;
   position: absolute;
   top: var(--searchbarHeight);
   bottom: 0;
@@ -86,4 +92,18 @@
   z-index: 1;
   transition: var(--resultsListTransition);
   transition-timing-function: var(--resultsListTransitionTiming);
+}
+
+.results-list-inner {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+.results-list-item {
+  box-sizing: border-box;
+  border: 1px solid lightgray;
+}
+.results-list-item-active {
+  border: 3px solid darkcyan;
 }

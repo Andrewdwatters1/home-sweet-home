@@ -11,6 +11,7 @@ class ResultsList extends Component {
       enableHideSidebar: false,
     }
   }
+
   enableHideSidebar = (e) => {
     if (![...e.target.classList].some(e => e === 'ignore')) {
       this.setState({
@@ -21,23 +22,31 @@ class ResultsList extends Component {
       });
     }
   }
+
   showSidebar = () => {
     document.documentElement.style.setProperty('--resultsListWidth', '200px');
   }
+
   hideSidebar = () => {
     if (this.state.enableHideSidebar) {
       document.documentElement.style.setProperty('--resultsListWidth', '20px');
     }
   }
 
+  updateSelectedResult = (i) => {
+    this.props.updateSelectedResult(i);
+    const tgts = document.querySelectorAll('li.results-list-item');
+    tgts.forEach(e => e.classList.remove('results-list-item-active'));
+    document.getElementById(`results-list-item-${i}`).classList.add('results-list-item-active');
+  }
   componentDidMount() {
     document.addEventListener('click', this.enableHideSidebar);
   }
-  render() { // MUST ADD CLASSNAME="ignore" to all elements
+
+  render() {
     const { searchResults } = this.props.query;
     const { state } = this.props.user;
-
-    console.log(searchResults[0]);
+    console.log(this.props.query.selectedSearchResult);
 
     return (
       <div
@@ -46,22 +55,25 @@ class ResultsList extends Component {
         onBlur={this.enableHideSidebar}
         onMouseLeave={this.hideSidebar}>
 
-        <ul>
+        <ul className="results-list-inner ignore">
           {this.props.query.searchResults
             .map((e, i) => {
               return (
                 <li
-                  onClick={() => this.props.updateSelectedResult(i)}>
-                  <p>{`${searchResults[i].address} \n\r${searchResults[i].city}, ${usStates[searchResults[i].province] || state}`}</p>
-                  <p>{`${searchResults[i].numBedroom} beds, ${searchResults[i].numBathroom} baths, ${searchResults[i].floorSizeValue} ${searchResults[i].floorSizeUnit}`}</p>
+                  onClick={() => this.updateSelectedResult(i)}
+                  className="results-list-item ignore"
+                  id={`results-list-item-${i}`}>
+                  <p className="ignore">{`${searchResults[i].address} \n\r${searchResults[i].city}, ${usStates[searchResults[i].province] || state}`}</p>
+                  <p className="ignore">{`${searchResults[i].numBedroom} beds, ${searchResults[i].numBathroom} baths, ${searchResults[i].floorSizeValue} ${searchResults[i].floorSizeUnit}`}</p>
                   {searchResults[i].statuses[0].type ?
-                    <p>{`${searchResults[i].statuses[0].type}: $${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}`}</p>
+                    <p className="ignore">{`${searchResults[i].statuses[0].type}: $${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}`}</p>
                     :
-                    <p>${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}</p>
+                    <p className="ignore">${searchResults[i].prices[0].amountMax || searchResults[i].proves[0].amountMax}</p>
                   }
                 </li>
               )
-            })}
+            })
+          }
         </ul>
 
       </div >
@@ -76,11 +88,3 @@ const mapStateToProps = state => {
   }
 }
 export default connect(mapStateToProps, { updateSelectedResult })(ResultsList);
-
-
-// 20474 E Hampden Pl
-// Aurora, CO 80013
-// 3 beds 3 baths 1,591 sqft
-
-// $359,900
-// [status]
