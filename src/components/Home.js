@@ -9,21 +9,19 @@ class Home extends Component {
 
   render() {
     // console.log(this.props.query.selectedSearchResult);
-    return (
-      <div>
-        {!this.props.query.searchResults ?
+    if (this.props.query.searchResults) {
+      return (
+        <div>
           <Searchbar />
-          :
-          <div>
-            <Searchbar />
-            <div className="home-main">
-              <PropertyContainer />
-              <ResultsList />
-            </div>
+          <div className="home-main">
+            <PropertyContainer />
+            <ResultsList />
           </div>
-        }
-      </div>
-    )
+        </div>
+      )
+    } else {
+      return <Searchbar />
+    }
   }
 }
 
