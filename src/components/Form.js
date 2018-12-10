@@ -158,7 +158,6 @@ class Form extends Component {
   }
 
   render() {
-    console.log(this.props.user);
     const { first, last, email, city, state, zip } = this.props.user;
 
     return (

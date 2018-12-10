@@ -4,6 +4,7 @@ const propertyTypes = require('./propertyTypes');
 module.exports = self = {
 
   destructureProperties: function (obj) {
+    const { state, allStatuses, allTypes } = obj;
     return new Promise(resolve => {
       const details = {};
       if (obj.details) {
@@ -17,44 +18,44 @@ module.exports = self = {
           ammenities[obj.ammenities[i][0]] = obj.ammenities[i][1];
         }
       }
-      resolve({ details, ammenities })
+      resolve({ details, ammenities, state, allStatuses, allTypes })
     });
   },
+
+
+
 
   formatQuery: async query => {
     let queryObj = await self.destructureProperties(query)
     const { details, ammenities } = queryObj;
-    let returnError = false;
+
     const queryParams = [];
-    // console.log(this);
-    // console.log(destructureProperties);
 
-    console.log(queryObj);
-
-    // COUNTRY
+    // COUNTRY AND STATE
     queryParams.push("country:US");
+    queryParams.push(`province:${queryObj.state}`)
 
 
     // CITY
-    if (details.citiesSelected) {
-      queryParams.push(details.citiesSelected.length > 1 ?
-        `city:(${[...details.citiesSelected].join(' OR ')})`
-        :
-        `city:${details.citiesSelected}`);
-    } else returnError = true;
+    if (details.citiesSelected && details.citiesSelected.length) {
+      if (details.citiesSelected.length > 1) {
+        queryParams.push(`city:(${[...details.citiesSelected].join(' OR ')})`)
+      } else {
+        queryParams.push(`city:${details.citiesSelected}`)
+      }
+    }
 
 
     // STATUS
     let status = ''
-    if (details.forRent && details.forSale) {
+    if (details.forRent && details.forSale || queryObj.allStatuses) {
       status = `statuses.type:(\"For Sale\" OR \"Short Term Rental\" OR Rental OR \"Rent To Own\")`;
     } else if (details.forRent) {
       status = `statuses.type:(\"Short Term Rental\" OR Rental OR \"Rent To Own\")`;
     } else if (details.forSale) {
       status = `statuses.type:(\"For Sale\" OR \"Rent To Own\")`;
-    } else {
-      returnError = true;
     }
+
     queryParams.push(status);
 
 
@@ -72,23 +73,30 @@ module.exports = self = {
 
 
     // TYPE
-    const allTypes = [];
-    if (details.singleFamily) propertyTypes.singleFamVals.forEach(e => allTypes.push(e));
-    if (details.condoOrTownhome) propertyTypes.condoVals.forEach(e => allTypes.push(e));
-    if (details.apartment) propertyTypes.aptVals.forEach(e => allTypes.push(e));
-    if (details.newBuild) propertyTypes.newVals.forEach(e => allTypes.push(e));
-    if (details.commercialOrInvestment) propertyTypes.rentalVals.forEach(e => allTypes.push(e));
-    if (details.land) propertyTypes.landVals.forEach(e => allTypes.push(e));
-    if (details.vacationOrOther) propertyTypes.otherVals.forEach(e => allTypes.push(e));
+    const selectedTypes = [];
 
-    queryParams.push(`propertyType:(${allTypes.join(' OR ')})`);
+    if (queryObj.allTypes) {
+      queryParams.push(`propertyType:*`);
+
+    } else {
+      if (details.singleFamily) propertyTypes.singleFamVals.forEach(e => selectedTypes.push(e));
+      if (details.condoOrTownhome) propertyTypes.condoVals.forEach(e => selectedTypes.push(e));
+      if (details.apartment) propertyTypes.aptVals.forEach(e => selectedTypes.push(e));
+      if (details.newBuild) propertyTypes.newVals.forEach(e => selectedTypes.push(e));
+      if (details.commercialOrInvestment) propertyTypes.rentalVals.forEach(e => selectedTypes.push(e));
+      if (details.land) propertyTypes.landVals.forEach(e => selectedTypes.push(e));
+      if (details.vacationOrOther) propertyTypes.otherVals.forEach(e => selectedTypes.push(e));
+
+      queryParams.push(`propertyType:(${selectedTypes.join(' OR ')})`);
+    }
+
 
 
     // PRICE
-    const minPrice = details.minPrice ? makeNumber(details.minPrice) : null;
-    const maxPrice = details.maxPrice ? makeNumber(details.maxPrice) : null;
+    const minPrice = details.minPrice ? formatPrice(details.minPrice) : null;
+    const maxPrice = details.maxPrice ? formatPrice(details.maxPrice) : null;
 
-    function makeNumber(str) {
+    function formatPrice(str) {
       if (str[str.length - 1] === "+") {
         return 10000000;
       } else if (str[str.length - 1] === "M") {
@@ -98,8 +106,8 @@ module.exports = self = {
         str = str.slice(0, str.length - 4);
         return (+str) * (1000);
       }
-
     }
+
     if (maxPrice && minPrice) {
       queryParams.push(`prices.amountMax:>${minPrice} AND prices.amountMax:<${maxPrice}`)
     } else if (maxPrice && !minPrice) {
@@ -168,9 +176,6 @@ module.exports = self = {
 
 
 
-
-
-
     // KEYWORDS 
     // features.key
     // brokers.agent
@@ -182,9 +187,7 @@ module.exports = self = {
     // descriptions.value
 
 
-    // FINAL ERROR CHECK AND RETURN
-    if (returnError) return "Error, query not contructed properly"
-    else return queryParams.join(' AND ');
+    return queryParams.join(' AND ');
   }
 }
 
@@ -208,39 +211,8 @@ module.exports = self = {
 
 
 
-//   ammenities: [
-//     ["pets", true],
-//     ["fees", "100"],
-//     ["bedsMax", "4"],
-//     ["sqftMax", "1,250"],
-//     ["lotSizeMax", ".5 acres"]
-//   ]
-// }
-// details = {
-//   citiesSelected: ['Amherst'],
-//   forSale: true,
-//   singleFamily: true,
-//   apartment: true,
-//   newBuild: true,
-//   minPriceIndex: 5,
-//   minPrice: '175,000',
-//   dateListed: 'week',
-//   locationSet: true,
-//   statusSet: true,
-//   typeSet: true,
-//   priceRangeSet: true
-// }
-
-
-
-// propertyTypes = {
-//   singleFamVals: ['House', 'Home', 'Single Family Dwelling', 'Residential'],
-//   condoVals: ['Condo', 'Townhouse'],
-//   aptVals: ['Apartment', 'Apartments', 'Dorm', 'Hostel*', 'Motels', 'Rental Unit', 'Room', 'Unit'],
-//   newVals: ['Manufactured Home', 'Mobile Home'],
-//   rentalVals: ['Apartment Building', 'Bed Breakfast', 'Building', 'Commercial*', 'Condo Building', 'Duplex', 'Industrial', 'Inns', 'Multi-Family Dwelling', 'Quadruplex', 'Rental Unit Building', 'Triplex'],
-//   landVals: ['Land', 'Farm', 'Island'],
-//   otherVals: ['Boat', 'Boat Slip', 'Bungalow', 'Cabin', 'Camper/RV', 'Campgrounds', 'Castle', 'Cave', 'Cottages', 'Development Site', 'Igloo', 'Lodges', 'Nature Lodge', 'Resorts', 'Tent', 'Tipi', 'Vacation Rental', 'Villa*']
-// }
-
-// const prices = [ '50,000', '75,000', '100,000', '125,000', '150,000', '175,000', '200,000', '225,000', '250,000', '275,000', '300,000', '325,000', '350,000', '375,000', '400,000', '425,000', '450,000', '475,000', '500,000', '550,000', '600,000', '650,000', '700,000', '750,000', '800,000', '850,000', '900,000', '950,000', '1M', '1.25M', '1.5M', '1.75M', '2M', '2.25M', '2.5M', '2.75M', '3M', '3.5M', '4M', '4.5M', '5M', '6M', '7M', '8M', '9M', '10M+'];
+// country:US AND 
+// province:CO AND 
+// statuses.type:("For Sale" OR "Short Term Rental" OR Rental OR "Rent To Own") AND 
+// propertyType:(House OR Home OR "Single Family Dwelling" OR Residential OR Condo OR Townhouse OR Apartment OR Apartments OR Dorm OR Hostel* OR Motels OR "Rental Unit" OR Room OR Unit OR "Manufactured Home" OR "Mobile Home" OR "Apartment Building" OR "Bed Breakfast" OR Building OR Commercial* OR "Condo Building" OR Duplex OR Industrial OR Inns OR "Multi-Family Dwelling" OR Quadruplex OR "Rental Unit Building" OR Triplex OR Land OR Farm OR Island OR Boat* OR Bungalow OR Cabin OR Camper/RV OR Campgrounds OR Castle OR Cave OR Cottages OR "Development Site" OR Igloo OR Lodges OR Nature Lodge OR Resorts OR Tent OR Tipi OR Vacation Rental OR Villa*) AND 
+// prices:*

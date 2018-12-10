@@ -159,7 +159,7 @@ class SearchPropertyAmmenities extends Component {
 
         <div name="parking">
           <label for="parking">Parking Required</label>
-          <input name="parking" type="checkbox" onChange={this.handleChange} checked={this.state.parking}/>
+          <input name="parking" type="checkbox" onChange={this.handleChange} checked={this.state.parking} />
           {/* <select name="parkingSpaces" onChange={this.handleChange} value={this.state.parkingSpaces}>
             <option value="" defaultValue>No min</option>
             <option value="1">1+</option>

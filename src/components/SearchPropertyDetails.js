@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 import { updateQuery } from '../redux/reducers/query';
@@ -48,18 +49,18 @@ class SearchPropertyDetails extends Component {
   }
 
   getCitiesListFromState = () => {
-    // const state = this.props.user.state;
-    // axios.post('/api/getRegionChildren', {
-    //   state: state,
-    //   childtype: "city"
-    // }).then(result => {
-    //   this.setState({
-    //     citiesDerivedFromState: [...result.data.response.list.region]
-    //       .map(e => e = e.name[0])
-    //       .sort()
-    //   })
-    // }).catch(error => console.log(error));
-    this.setState({ citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins'] })
+    const state = this.props.user.state;
+    axios.post('/api/getRegionChildren', {
+      state: state,
+      childtype: "city"
+    }).then(result => {
+      this.setState({
+        citiesDerivedFromState: [...result.data.response.list.region]
+          .map(e => e = e.name[0])
+          .sort()
+      })
+    }).catch(error => console.log(error));
+    // this.setState({ citiesDerivedFromState: ['Aurora', 'Denver', 'Centennial', 'Colorado Springs', 'Pueblo', 'Fort Collins'] })
   }
 
 
@@ -188,8 +189,9 @@ class SearchPropertyDetails extends Component {
 
 
   componentDidMount() {
-    // if (this.props.user.state) this.getCitiesListFromState();
-    this.getCitiesListFromState(); // REMOVE ME
+    if (this.props.user.state) this.getCitiesListFromState();
+    else this.props.history.push('/welcome');
+    // this.getCitiesListFromState(); // REMOVE ME
     // TODO: else redirect back to form or otherwise get a state for the user
   }
 
@@ -210,7 +212,6 @@ class SearchPropertyDetails extends Component {
 
             <select
               value={this.state.citiesSelected[0]}
-              required
               onChange={this.updateCitiesList}
               onFocus={this.updateCitiesList}
               id="cities-list-0">
@@ -353,7 +354,6 @@ class SearchPropertyDetails extends Component {
             </div>
           </div>
 
-          {/* <button onClick={() => this.props.submitPropertySearch(this.state)}>SEARCH</button> */}
         </div>
       </div>
     )
@@ -366,4 +366,4 @@ const mapStateToProps = state => {
     query: state.query
   }
 }
-export default connect(mapStateToProps, { updateQuery })(SearchPropertyDetails);
+export default withRouter(connect(mapStateToProps, { updateQuery })(SearchPropertyDetails));

@@ -32,11 +32,11 @@ module.exports = {
 
   getSearchResults: async (req, res) => {
     const { body } = req;
-    res.status(200).send(sampleData);
+    // res.status(200).send(sampleData);
     
-    // const query = await propertySearch.formatQuery(body)
-    // console.log('FINAL QUERY TO BE SENT', query)
-    //
+    const query = await propertySearch.formatQuery(body)
+    console.log('FINAL QUERY TO BE SENT', query)
+    
     // const dataFinitiOptions = {
     //   url: "https://api.datafiniti.co/v4/properties/search",
     //   method: "POST",
@@ -51,7 +51,7 @@ module.exports = {
     //     "Content-Type": "application/json"
     //   }
     // }
-    //
+    
     // request(dataFinitiOptions, (error, response, body) => {
     //   if (error) {
     //     res.send(500).send("Error: " + error, "RES: " + response)
@@ -66,7 +66,7 @@ module.exports = {
   getSinglePropertySearchResults: (req, res) => {
     zillow.get('GetSearchResults', req.body)
       .then(result => {
-        console.log(result)
+        // console.log(result)
         res.status(200).send(result.response.results.result)
       })
       .catch(error => console.log(error))
@@ -76,7 +76,7 @@ module.exports = {
     console.log(zillow)
     zillow.get('GetRegionChildren', req.body)
       .then(result => {
-        console.log(result)
+        // console.log(result)
         res.status(200).send(result);
       })
       .catch(error => console.log(error));

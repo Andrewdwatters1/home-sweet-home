@@ -5,7 +5,7 @@ import axios from 'axios';
 import SearchPropertyDetails from './SearchPropertyDetails';
 import SearchPropertyAmmenities from './SearchPropertyAmmenities';
 import SearchByAddressOrMLS from './SearchByAddressOrMLS';
-import { saveSearchResults } from '../redux/reducers/query';
+import { retainSubmittedQuery, saveSearchResults } from '../redux/reducers/query';
 
 class Searchbar extends Component {
   constructor() {
@@ -13,23 +13,32 @@ class Searchbar extends Component {
   }
 
   validateAndSubmitQuery = () => {
-    const { query } = this.props;
+    const { searchQuery } = this.props.query;
+    const { state } = this.props.user;
 
-    const requiredFields =
-      query.details.some(e => e[0] === "typeSet")
-      && query.details.some(e => e[0] === "statusSet")
-      && query.details.some(e => e[0] === "locationSet")
-      && query.details.some(e => e[0] === "priceRangeSet");
+    if (searchQuery && searchQuery.details) {
+      var statusExists = searchQuery.details.some(e => e[0] === 'statusSet');
+      var type = searchQuery.details.some(e => e[0] === 'typeSet');
+      if (!statusExists) searchQuery.allStatuses = true;
+      if (!type) searchQuery.allTypes = true;
 
-    if (requiredFields) {
-      axios.post('/api/getSearchResults', query)
+      axios.post('/api/getSearchResults', { ...searchQuery, state })
         .then(result => {
           console.log(result);
           // if num_records greater than 1 result.data.records will return an array
           console.log(result.data.records[0])
         })
         .catch(error => console.log('Error in query submission', error));
-    } else alert('Please complete the required fields (Property-type, Status, Location, Price) ')
+      this.props.retainSubmittedQuery({ ...this.props.query, ...this.props.user });
+    } else {
+      axios.post('/api/getSearchResults', { state, allStatuses: true, allTypes: true })
+        .then(result => {
+          console.log(result);
+          console.log(result.data.records[0]);
+        })
+        .catch(error => console.log('Error in query submission', error));
+      this.props.retainSubmittedQuery({ ...this.props.query, ...this.props.user });
+    }
   }
 
   getTestData = () => {
@@ -58,8 +67,8 @@ class Searchbar extends Component {
 
 
               <div>
-                {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
-                <button onClick={this.getTestData}>SEARCH</button>
+                <button onClick={this.validateAndSubmitQuery}>SEARCH</button>
+                {/* <button onClick={this.getTestData}>SEARCH</button> */}
               </div>
 
             </div>
@@ -70,8 +79,8 @@ class Searchbar extends Component {
               <SearchPropertyDetails />
               <SearchPropertyAmmenities />
               {/* <SearchByAddressOrMLS /> */}
-              {/* <button onClick={this.validateAndSubmitQuery}>SEARCH</button> */}
-              <button onClick={this.getTestData}>SEARCH</button>
+              <button onClick={this.validateAndSubmitQuery}>SEARCH</button>
+              {/* <button onClick={this.getTestData}>SEARCH</button> */}
             </div>
         }
       </div>
@@ -86,4 +95,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { saveSearchResults })(Searchbar);
+export default connect(mapStateToProps, { saveSearchResults, retainSubmittedQuery })(Searchbar);
