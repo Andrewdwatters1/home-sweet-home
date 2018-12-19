@@ -1,32 +1,35 @@
 const axios = require('axios');
-// const CircularJSON = require('circular-json');
-
-
 // EXPRESS SESSION INFO https://www.npmjs.com/package/express-session
 
 module.exports = {
-  // getCurrentUser: (req, res) => {
-  //   res.send(req.session.user);
-  // },
-  // logout: (req, res) => {
-  //   req.session.destroy();
-  //   res.sendStatus(200);
-  // },
-  // auth: async (req, res) => {
-  //   try {
-  //     const db = req.app.get('db');
-  //     let users = await db.getUserById() // => SELECT * FROM users WHERE id = $1;
 
-  //     if (users.length) req.session.user = users[0]
-  //     else {
-  //       let users = await db.createNewUser(userInfo)
-  //       req.session.user = users[0];
-  //     }
-  //     console.log('User set on session');
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // },
+  userLogin: (req, res) => {
+    const { first, last, email, state } = req.body;
+    const db = req.app.get('db');
+    db.auth.get_user_by_email(email)
+      .then(result => {
+        if (result.length) {
+          req.session.user = result[0];
+          res.status(200).send(req.session.user);
+        } else {
+          db.auth.register_user([first, last, email, state])
+            .then(result => {
+              req.session.user = result[0];
+              res.status(200).send(req.session.user);
+            })
+        }
+      })
+  },
+
+  retrieveUser: (req, res) => {
+    res.status(200).send(req.session);
+  },
+
+  logout: (req, res) => {
+    req.session.destroy()
+    res.sendStatus(200);
+  },
+
   getLocationInfo: (req, res) => {
     const { lat, long } = req.body;
     axios.post(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${long}&key=${process.env.GOOGLE_MAPS_API_KEY}`)
@@ -35,6 +38,7 @@ module.exports = {
       })
       .catch(error => console.log(error));
   },
+
   getCityFromZip: (req, res) => {
     const { value } = req.body;
     axios.get(`https://api.zippopotam.us/us/${value}`)
@@ -43,4 +47,5 @@ module.exports = {
       })
       .catch(error => console.log(error));
   }
+
 }

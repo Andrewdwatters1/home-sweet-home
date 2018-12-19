@@ -112,8 +112,10 @@ class Form extends Component {
     e.preventDefault();
     const { first, last, email, city, state, zip } = this.props.user;
     if (this.state.submitEnabled && first && last && email && city && state && zip) {
-      this.props.history.push('/');
-      // axios.post('/api/auth')
+      
+      axios.post('/api/userLogin', { first, last, email, state })
+        .then(response => response.data && this.props.history.push('/'))
+        .catch(error => console.log(error));
     }
   }
 
@@ -151,10 +153,15 @@ class Form extends Component {
       .catch(error => console.log('error in geolocation', error));
   }
 
+  checkForReturningUser = () => {
+    axios.get('/api/retrieveUser').then(result => console.log(result));
+  }
+
   componentDidMount() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.getLocationInfo);
     }
+    this.checkForReturningUser()
   }
 
   render() {
